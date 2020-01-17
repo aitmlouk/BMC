@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="quality_control.quality_check_view_form" model="ir.ui.view">
+        <field name="name">quality.check.form.bmc</field>
+        <field name="model">quality.check</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <!--<button name="do_cancel" type="action" string="Valider" class="oe_highlight"/>-->
+                    <button name="do_cancel" type="object" string="Annuler avis" class="oe_highlight"/>
+                    <button name="do_validate" type="object" string="Valider" class="oe_highlight"/>
+                    <button name="do_pass" type="object" class="btn-primary" attrs="{'invisible': [('quality_state', '!=', 'none')]}" string="Pass"/>
+                    <button name="do_pass" type="object" attrs="{'invisible': [('quality_state', '!=', 'fail')]}" groups="quality.group_quality_manager" string="Pass"/>
+                    <button name="do_fail" type="object" class="btn-primary" attrs="{'invisible': [('quality_state', '!=', 'none')]}" string="Fail"/>
+                    <button name="do_fail" type="object" attrs="{'invisible': [('quality_state', '!=', 'pass')]}" groups="quality.group_quality_manager" string="Fail"/>
+                    <button name="do_alert" type="object" attrs="{'invisible': ['|', ('alert_ids', '!=', []), ('quality_state', '!=', 'pass')]}" string="Make Alert"/>
+                    <button name="do_alert" type="object" class="btn-primary" attrs="{'invisible': ['|', ('alert_ids', '!=', []), ('quality_state', '!=', 'fail')]}" string="Make Alert"/>
+                    <field name="quality_state" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_see_alerts" icon="fa-bell" type="object" class="oe_stat_button" attrs="{'invisible': [('alert_count', '=', 0)]}">
+                            <field name="alert_count" string="Alerts" widget="statinfo"/>
+                        </button>
+                    </div>
+                    <h1>
+                      Réception de ferraille
+                    </h1>
+                    <group>
+                        <group string="Détails Produit">
+                            <field name="product_id"/>
+                            <label for="qty"/>
+                            <div class="o_row">
+                                <field name="qty"/>
+                                <field name="uom_id" options="{'no_open': True, 'no_create': True}"/>
+                            </div>
+                            <field name="price_ttc"/>
+                            <field name="supplier_id"/>
+                            <field name="origin"/>
+
+                            <field name="devise_id" invisible="1"/>
+                            <field name="lot_id" groups="stock.group_production_lot"/>
+                            <field name="test_type" invisible="1"/>
+                            <field name="test_type_id" invisible="1"/>
+                            <field name="measure" attrs="{'invisible': [('test_type', '!=', 'measure')]}"/>
+                            <field name="alert_ids" invisible="1"/>
+                        </group>
+                        <group string="Détails contrôle ">
+                            <field name="scrap_id"/>
+                            <field name="control_comment"/>
+                            <field name="chimique_comment"/>
+                            <field name="tri_type_id"/>
+                            <field name="days_number"/>
+                            <field name="control_date" invisible="1"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="user_id" string="Control Person" invisible="1"/>
+                        </group>
+                    </group>
+                    <group>
+                      <group>
+                        <field name="picture_1" widget="image" nolabel="1"/>
+                      </group>
+                      <group>
+                        <field name="picture_2" widget="image" nolabel="1"/>
+                      </group>
+                    </group>
+                    <group string="Validations contrôle">
+                      <group>
+                        <label for="stock_resp"/>
+                        <div class="o_row">
+                                <field name="stock_resp"/>
+                                <field name="stock_resp_id" options="{'no_open': True, 'no_create': True}"/> -
+                                <field name="resp_st_validation_date" options="{'no_open': True, 'no_create': True}"/>
+                        </div>
+                        <label for="quality_resp"/>
+                        <div class="o_row">
+                                <field name="quality_resp"/>
+                                <field name="quality_resp_id" options="{'no_open': True, 'no_create': True}"/> -
+                                <field name="resp_qu_validation_date" options="{'no_open': True, 'no_create': True}"/>
+                        </div>
+                        <label for="tri_resp"/>
+                        <div class="o_row">
+                                <field name="tri_resp"/>
+                                <field name="tri_resp_id" options="{'no_open': True, 'no_create': True}"/> -
+                                <field name="resp_tri_validation_date" options="{'no_open': True, 'no_create': True}"/>
+                        </div>
+                        <label for="direction"/>
+                        <div class="o_row">
+                                <field name="direction"/>
+                                <field name="direction_id" options="{'no_open': True, 'no_create': True}"/> -
+                                <field name="dir_validation_date" options="{'no_open': True, 'no_create': True}"/>
+                        </div>
+                      </group>
+                    </group>
+                    <notebook>
+                        <page string="Notes">
+                            <field name="note"/>
+                        </page>
+                        <page string="Informations complémentaires">
+                          <group>
+                            <group>
+                              <field name="create_date" string="Contrôle créé le"/>
+                              <field name="point_id"/>
+                              <field name="team_id"/>
+                            </group>
+                            <group>
+                              <field name="purchase_order_id" string="Bon de commande"/>
+                              <field name="purchase_date"/>
+                              <field name="picking_id" string="Opération"/>
+                              <field name="received_date"/>
+                              <field name="ticket_number"/>
+                            </group>
+                          </group>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers"/>
+                    <field name="message_ids" widget="mail_thread"/>
+                </div>
+            </form>
+
+        </field>
+    </record>
+
+    <record id="stock_picking_form_view_inherited_bmc" model="ir.ui.view">
+        <field name="name">stock.picking.form.inherit.bmc</field>
+        <field name="model">stock.picking</field>
+        <field name="inherit_id" ref="stock.view_picking_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='picking_type_id']" position="after">
+                <field name="ticket_number"/>
+            </xpath>
+            <xpath expr="//field[@name='origin']" position="after">
+                <field name="purchase_id"/>
+                <field name="account_move_id"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

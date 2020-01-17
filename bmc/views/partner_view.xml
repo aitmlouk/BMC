@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="partner_form_view_inherited_bmc_partner" model="ir.ui.view">
+        <field name="name">res.partner.form.inherited.bmc.partner</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <!--context="{'res_partner_search_mode': 'customer'}"-->
+            <xpath expr="//field[@name='vat']" position="attributes">
+                <attribute name="attrs">{'invisible': 1}</attribute>
+            </xpath>
+            <xpath expr="//field[@name='currency_id']" position="attributes">
+                <attribute name="attrs">{'readonly': 0, 'invisible': [('company_type', '!=', 'company')]}</attribute>
+            </xpath>
+            <xpath expr="//page[last()]" position="after">
+                <page string="Identifiants" attrs="{'invisible': [('company_type','!=', 'company')]}">
+                    <group string="Maroc-identifiants">
+                        <field name="ice"/>
+                        <field name="register"/>
+                        <field name="tax_identification"/>
+                        <field name="patent"/>
+                    </group>
+                </page>
+            </xpath>
+            <xpath expr="//page[@name='sales_purchases']//field[@name='user_id']" position="before">
+                <field name="is_customer"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="partner_form_view_inherited_bmc_supplier" model="ir.ui.view">
+        <field name="name">res.partner.form.inherited.bmc.partner.supplier</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="account.view_partner_property_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='property_supplier_payment_term_id']" position="before">
+                <field name="is_supplier"/>
+                <field string="Fournisseur matière première" name="supplier_materiel"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Product views -->
+    <record id="product_form_view_bmc_inherited" model="ir.ui.view">
+        <field name="name">product.template.form.inherited.bmc</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[last()]" position="after">
+                <page string="Informations BMC">
+                    <group col="2">
+                        <field name="raw_materials"/>
+                        <field name="tri"/>
+                        <field name="quality_id"/>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+
+    <!-- res.users views -->
+    <record id="res_users_form_view_bmc_inherited" model="ir.ui.view">
+        <field name="name">res.users.form.inherited.bmc</field>
+        <field name="model">res.users</field>
+        <field name="inherit_id" ref="base.view_users_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[last()]" position="after">
+                <page string="Rôles contrôle qualité">
+                    <group col="2" string="Contrôle qualité réception">
+                        <field name="stock_responsible"/>
+                        <field name="quality_responsible"/>
+                        <field name="tri_responsible"/>
+                        <field name="direction"/>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+</odoo>

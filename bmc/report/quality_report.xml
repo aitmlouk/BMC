@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <report
+            string="Réception de Ferraille"
+            id="report_quality_check"
+            model="quality.check"
+            report_type="qweb-pdf"
+            name="bmc.quality_report_template"
+            file="bmc.quality_report_template"
+            print_report_name="'Quality Check - %s' % (object.name)"
+        />
+    </data>
+</odoo>

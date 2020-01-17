@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+<template id="quality_report_template">
+    <t t-call="web.html_container">
+        <t t-foreach="docs" t-as="o">
+            <t t-call="web.external_layout">
+                <div class="page">
+                    <center style="font-size:22px">Système de Management de la Qualité</center>
+                    <center style="font-size:19px">Réception de Ferraille</center>
+             <hr style="color:black; background-color:firebrick; height:3px;" />
+              <br/>
+
+			<table class="table table-bordered">
+			  <tr>
+			    <td >Ticket N: <span t-field="o.ticket_number"/></td>
+			    <td >Prix: <span t-field="o.price_ttc"/></td>
+			 </tr>
+			  <tr>
+			  	<td >Date de réception: <span t-field="o.received_date"/></td>
+			    <td >Qualité de ferraille: <span t-field="o.scrap_id.name"/></td>
+			 </tr>
+			  <tr>
+			  	<td >Fournisseur : <span t-field="o.supplier_id.name"/></td>
+			  	<td > Type de Tri : <span t-field="o.tri_type_id.name"/></td>
+			  </tr>
+			</table>
+
+            <table class="table table-bordered">
+                <tr>
+			  	<td >Poids net (KG) : </td>
+
+			  </tr>
+			  <tr>
+			    <td >Exterieur</td>
+			  	<td >BMC</td>
+			 </tr>
+                <tr>
+			    <td > --</td>
+			  	<td > --</td>
+			 </tr>
+			</table>
+
+
+            <table class="table table-bordered">
+               <tr>
+                 <td ><p><center><u>Commentaire suite au contrôle visuel:</u></center></p>
+                 <span t-field="o.control_comment"/></td>
+                </tr>
+                <tr>
+                 <td ><p><center><u>Commentaire suite a l'analyse chimique:</u></center></p>
+                 <span t-field="o.chimique_comment"/></td>
+                </tr>
+            </table>
+
+            <table class="table table-bordered">
+               <tr>
+                 <td ><span t-field="o.picture_1"/></td>
+                   <td ><span t-field="o.picture_1"/></td>
+                </tr>
+            </table>
+
+                  <table class="table table-striped">
+                         <tr class="border-black">
+                            <td >Responsable Stock </td>
+                            <td >Responsable Qualité  </td>
+                            <td >Responsable Tri </td>
+                             <td >Direction </td>
+                        </tr>
+                      <tr class="border-black">
+                            <td ><span t-field="o.resp_st_validation_date"/> </td>
+                            <td ><span t-field="o.resp_qu_validation_date"/> </td>
+                            <td ><span t-field="o.resp_tri_validation_date"/> </td>
+                             <td ><span t-field="o.dir_validation_date"/> </td>
+                        </tr>
+                      <tr class="border-black">
+                            <td ><span t-field="o.stock_resp_id.name"/> </td>
+                            <td ><span t-field="o.quality_resp_id.name"/> </td>
+                            <td ><span t-field="o.tri_resp_id.name"/> </td>
+                             <td ><span t-field="o.direction_id.name"/> </td>
+                        </tr>
+                    </table>
+
+                </div>
+            </t>
+        </t>
+    </t>
+</template>
+</odoo>
