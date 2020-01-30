@@ -14,15 +14,6 @@
             </xpath> -->
 
             <xpath expr="//field[@name='company_id']/.." position="after">
-                <!-- text-right works in edit mode, pull-right works in readonly mode -->
-                <group name="frais_left" string="Frais &amp; Taxes">
-                    <field name="exchange_rate" class="text-right pull-right"/>
-                    <field name="tva_theoretical" class="text-right pull-right"/>
-                    <field name="tva" class="text-right pull-right"/>
-                    <field name="transport_cost" class="text-right pull-right"/>
-                    <field name="discount_eva" widget="percentage"/>
-                    <!-- <field name="transit_cost" class="text-right pull-right"/> -->
-                </group>
                 <group name="frais_right" string="Frais &amp; Taxes">
                     <!-- <field name="bank_charges" class="text-right pull-right"/> -->
                     <field name="customs_theoretical" class="text-right pull-right"/>
@@ -42,22 +33,6 @@
                             <field name="product_id" string="Article"/>
                             <field name="bill_per" widget="percentage" sum="Total" invisible="1"/>
                             <field name="product_qty" widget="integer" string="Quantité"/>
-                            <field name="price_unit" string="Prix unitaire"
-                                options="{'widget': 'monetary', 'currency_field': 'currency_id'}"/>
-                            <field name="price_subtotal" string="Total HT"
-                                options="{'widget': 'monetary', 'currency_field': 'currency_id'}"/>
-                            <field name="currency_id" invisible="1"/>
-                            <field name="transport" sum="Total"/>
-                            <field name="price_total_dirhams"/>
-                            <field name="droit" widget="percentage"/>
-                            <field name="total_customs" sum="Total Douane"/>
-                            <field name="tva" sum="Total TVA"/>
-                            <!-- <field name="transit_cost" sum="Total Transit"/> -->
-                            <field name="bank_and_misc_costs" sum="Total Bank and misc Costs"/>
-                            <field name="total"/>
-                            <field name="list_price" readonly="0" required="1"/>
-                            <field name="margin_amount" required="1"/>
-                            <field name="margin_rate" widget="percentage" required="1"/>
                         </tree>
                     </field>
                 </page>

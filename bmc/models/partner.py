@@ -29,6 +29,7 @@ class Product(models.Model):
                                  string="Point de controle",
                                  help="Control point"
                                  )
+    define_product = fields.Boolean(string="Produit fini", default=False)
 
     @api.onchange('raw_materials')
     def onchange_raw_materials(self):

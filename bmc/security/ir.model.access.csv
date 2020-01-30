@@ -1,3 +1,4 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_quality_bmc_scrap,bmc.scrap,bmc.model_bmc_scrap,quality.group_quality_user,1,1,1,0
-access_quality_tri_type,tri.type,bmc.model_tri_type,quality.group_quality_user,1,1,1,0
+access_quality_bmc_scrap,bmc.scrap,bmc.model_bmc_scrap,quality.group_quality_user,1,1,1,1
+access_quality_tri_type,tri.type,bmc.model_tri_type,quality.group_quality_user,1,1,1,1
+access_quality_approvals_line,approval.request.line,bmc.model_approval_request_line,quality.group_quality_user,1,1,1,1

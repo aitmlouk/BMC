@@ -13,7 +13,7 @@
                 <attribute name="attrs">{'readonly': 0, 'invisible': [('company_type', '!=', 'company')]}</attribute>
             </xpath>
             <xpath expr="//page[last()]" position="after">
-                <page string="Identifiants" attrs="{'invisible': [('company_type','!=', 'company')]}">
+                <page string="Identifiants" attrs="{'invisible': ['&amp;',('company_type', '!=', 'company'),('parent_id', '=', False)]}">
                     <group string="Maroc-identifiants">
                         <field name="ice"/>
                         <field name="register"/>
@@ -24,6 +24,12 @@
             </xpath>
             <xpath expr="//page[@name='sales_purchases']//field[@name='user_id']" position="before">
                 <field name="is_customer"/>
+            </xpath>
+            <xpath expr="//field[@name='website']" position="attributes">
+                <attribute name="attrs">{'invisible': ['&amp;',('company_type', '!=', 'company'),('parent_id', '=', False)]}</attribute>
+            </xpath>
+            <xpath expr="//field[@name='category_id']" position="attributes">
+                <attribute name="attrs">{'invisible': ['&amp;',('company_type', '!=', 'company'),('parent_id', '=', False)]}</attribute>
             </xpath>
         </field>
     </record>
@@ -40,6 +46,19 @@
         </field>
     </record>
 
+    <record id="view_bmc_res_partner_filter" model="ir.ui.view">
+            <field name="name">res.partner.bmc</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="base.view_res_partner_filter"/>
+            <field name="arch" type="xml">
+                <xpath expr="//filter[@name='inactive']" position="before">
+                   <filter name="is_customer" string="Clients" domain="[('is_customer', '=', True)]"/>
+                    <filter name="is_supplier" string="Fournisseurs" domain="[('is_supplier', '=', True)]"/>
+                    <filter name="is_supplier" string="Fournisseurs Mat.Prem." domain="[('supplier_materiel', '=', True)]"/>
+                </xpath>
+            </field>
+    </record>
+
     <!-- Product views -->
     <record id="product_form_view_bmc_inherited" model="ir.ui.view">
         <field name="name">product.template.form.inherited.bmc</field>
@@ -52,6 +71,7 @@
                         <field name="raw_materials"/>
                         <field name="tri"/>
                         <field name="quality_id"/>
+                        <field name="define_product"/>
                     </group>
                 </page>
             </xpath>

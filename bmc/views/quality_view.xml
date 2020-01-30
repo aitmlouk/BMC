@@ -9,10 +9,11 @@
                     <!--<button name="do_cancel" type="action" string="Valider" class="oe_highlight"/>-->
                     <button name="do_cancel" type="object" string="Annuler avis" class="oe_highlight"/>
                     <button name="do_validate" type="object" string="Valider" class="oe_highlight"/>
-                    <button name="do_pass" type="object" class="btn-primary" attrs="{'invisible': [('quality_state', '!=', 'none')]}" string="Pass"/>
+                    <!--<button name="do_pass" type="object" class="btn-primary" attrs="{'invisible': [('quality_state', '!=', 'none')]}" string="Pass"/>
                     <button name="do_pass" type="object" attrs="{'invisible': [('quality_state', '!=', 'fail')]}" groups="quality.group_quality_manager" string="Pass"/>
                     <button name="do_fail" type="object" class="btn-primary" attrs="{'invisible': [('quality_state', '!=', 'none')]}" string="Fail"/>
                     <button name="do_fail" type="object" attrs="{'invisible': [('quality_state', '!=', 'pass')]}" groups="quality.group_quality_manager" string="Fail"/>
+                    -->
                     <button name="do_alert" type="object" attrs="{'invisible': ['|', ('alert_ids', '!=', []), ('quality_state', '!=', 'pass')]}" string="Make Alert"/>
                     <button name="do_alert" type="object" class="btn-primary" attrs="{'invisible': ['|', ('alert_ids', '!=', []), ('quality_state', '!=', 'fail')]}" string="Make Alert"/>
                     <field name="quality_state" widget="statusbar"/>
@@ -130,11 +131,210 @@
         <field name="arch" type="xml">
             <xpath expr="//field[@name='picking_type_id']" position="after">
                 <field name="ticket_number"/>
+                <field name="quantity_done" invisible="1"/>
             </xpath>
             <xpath expr="//field[@name='origin']" position="after">
                 <field name="purchase_id"/>
                 <field name="account_move_id"/>
+                <field name="approval_id"/>
+            </xpath>
+            <xpath expr="//field[@name='group_id']" position="after">
+                <field name="tri" invisible="0" readonly="1"/>
+                <field name="expected_date" invisible="0" readonly="1"/>
+                <field name="deadline_tri" readonly="1"/>
+            </xpath>
+            <xpath expr="//button[@name='action_cancel']" position="after">
+                <button name="action_tri" string="Fin du Tri" attrs="{'invisible': [('state', '!=', 'done'), ('deadline_tri', '!=', ''), ('tri', '=', 'False')]}" type="object" class="oe_highlight"/>
+                <button name="cancel_action_tri" string="Annuler fin du Tri" attrs="{'invisible': [('deadline_tri', '=', '')]}" type="object" class="oe_highlight"/>
             </xpath>
         </field>
     </record>
+
+    <!-- purchase.order-->
+    <record id="purchase_order_form_view_inherited_bmc" model="ir.ui.view">
+        <field name="name">purchase.order.form.inherit.bmc</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="purchase.purchase_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='date_approve']" position="after">
+                <field name="order_tri" invisible="0"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Approval.category-->
+    <record id="app_categ_form_view_inherited_bmc" model="ir.ui.view">
+        <field name="name">approval.category.form.inherit.bmc</field>
+        <field name="model">approval.category</field>
+        <field name="inherit_id" ref="approvals.approval_category_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='has_location']" position="after">
+                <field name="multi_article" invisible="0"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Approval.request-->
+    <record id="app_request_form_view_inherited_bmc" model="ir.ui.view">
+        <field name="name">approval.request.form.inherit.bmc</field>
+        <field name="model">approval.request</field>
+        <field name="inherit_id" ref="approvals.approval_request_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='request_owner_id']" position="after">
+                <field name="employee_id" invisible="0"/>
+                <field name="department_id"/>
+            </xpath>
+            <xpath expr="//field[@name='date_confirmed']" position="after">
+                <field name="picking_id"/>
+                <field name="multi_article" invisible="1"/>
+            </xpath>
+             <xpath expr="//field[@name='items']" position="before">
+                <xpath expr="//field[@name='request_owner_id']" position="move"/>
+              </xpath>
+
+            <xpath expr="//page[@name='description']" position="before">
+                <group string="Articles" attrs="{'invisible':[('multi_article','=',False)]}">
+                      <field name="approval_line_ids" nolabel="1" widget="section_and_note_one2many" mode="tree,kanban">
+                        <tree editable="bottom" string="Approval Request Line">
+                             <control>
+                                  <create name="add_product_control" string="Ajouter une ligne"/>
+                              </control>
+                              <field name="product_id" domain="['&amp;',('raw_materials','=',False),('define_product','=',False)]"/>
+                              <field name="quantity"/>
+                              <field name="uom_id" string=" "/>
+                        </tree>
+                      </field>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="ap_request_form_view_inherited_bmc" model="ir.ui.view">
+        <field name="name">approval.request.form.inherit.bmc</field>
+        <field name="model">approval.request</field>
+        <field name="inherit_id" ref="approvals.approval_request_view_tree"/>
+        <field name="arch" type="xml">
+        <xpath expr="//tree[1]/field[@name='name']" position="before">
+            <xpath expr="//field[@name='category_id']" position="move"/>
+          </xpath>
+          <xpath expr="//tree[1]/field[@name='name']" position="attributes">
+            <attribute name="string">Référence</attribute>
+          </xpath>
+          <xpath expr="//tree[1]/field[@name='name']" position="after">
+            <field name="employee_id"/>
+            <field name="department_id"/>
+          </xpath>
+          <xpath expr="//field[@name='request_owner_id']" position="attributes">
+            <attribute name="attrs">{}</attribute>
+            <attribute name="invisible">1</attribute>
+          </xpath>
+          <xpath expr="//field[@name='request_status']" position="attributes">
+            <attribute name="string">Étape</attribute>
+          </xpath>
+          <xpath expr="//field[@name='request_status']" position="after">
+            <field name="create_date"/>
+          </xpath>
+          <xpath expr="//field[@name='category_id']" position="attributes">
+            <attribute name="string">Catégorie</attribute>
+          </xpath>
+        </field>
+    </record>
+
+    <!-- Approvals lines -->
+    <record id="approval_request_line_view_tree" model="ir.ui.view">
+        <field name="name">approval.request.line.view.tree</field>
+        <field name="model">approval.request.line</field>
+        <field name="priority">10</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="request_id"/>
+                <field name="product_id"/>
+                <field name="quantity"/>
+                <field name="uom_id"/>
+                <field name="create_date" string="Date de création"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="approval_line_search_view_search" model="ir.ui.view">
+        <field name="name">approval.request.line.search</field>
+        <field name="model">approval.request.line</field>
+        <field name="priority">20</field>
+        <field name="arch" type="xml">
+            <form string="Request" >
+                <sheet string="Approval Request Line">
+                    <h1>
+                      <field name="request_id"/>
+                    </h1>
+                    <group>
+                      <group string="Informations">
+                        <field name="product_id"/>
+                        <field name="quantity"/>
+                        <field name="uom_id" can_create="true" can_write="true" modifiers="{&quot;readonly&quot;: true}"/>
+                      </group>
+                    </group>
+                  </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="approval_line_request_action" model="ir.actions.act_window">
+        <field name="name">Détails des demandes</field>
+        <field name="res_model">approval.request.line</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain"></field>
+    </record>
+
+
+    <menuitem
+        id="approvals_line_menu"
+        parent="approvals.approvals_menu_root"
+        name="Détails des demandes"
+        action="approval_line_request_action"
+        sequence="11"/>
+
+    <!-- sale.order-->
+    <record id="bmc_mrp_production_action" model="ir.actions.act_window">
+            <field name="name">Manufacturing Orders</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">mrp.production</field>
+            <field name="view_mode">tree,kanban,form,calendar,pivot,graph</field>
+            <field name="domain">[('order_id', '=', active_id)]</field>
+            <field name="help" type="html">
+              <p class="o_view_nocontent_smiling_face">
+                Create a new manufacturing order <br/>
+              </p><p>
+                Consume components and build finished products using bills of materials
+              </p>
+            </field>
+    </record>
+
+    <record id="sale_order_form_view_inherited_bmc" model="ir.ui.view">
+        <field name="name">sale.order.form.inherit.bmc</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+          <xpath expr="//button[@name='action_view_invoice']" position="after">
+            <button class="oe_stat_button" icon="fa-recycle" type="action" name="%(bmc_mrp_production_action)d" attrs="{'invisible': [('mrp_count', '=', 0)]}">
+              <field name="mrp_count" string="Ordre de fabrication" widget="statinfo"/>
+            </button>
+          </xpath>
+        </field>
+    </record>
+
+    <!-- mrp.production-->
+    <record id="mrp_production_form_view_inherited_bmc" model="ir.ui.view">
+        <field name="name">mrp.production.form.inherit.bmc</field>
+        <field name="model">mrp.production</field>
+        <field name="inherit_id" ref="mrp.mrp_production_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='origin']" position="after">
+                <field name="order_id"/>
+            </xpath>
+            <xpath expr="//field[@name='bom_id']" position="after">
+                <field name="lost"/>
+            </xpath>
+        </field>
+    </record>
+
 </odoo>

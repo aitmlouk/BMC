@@ -6,7 +6,8 @@
     'summary': 'Purchase and other Customizations',
     'category': 'Purchase',
     'description': '',
-    'depends': ['purchase', 'stock', 'product', 'quality', 'quality_control'],
+    'depends': ['purchase', 'stock', 'product', 'quality',
+                'quality_control','approvals', 'sale', 'mrp'],
     'data': [
         'security/ir.model.access.csv',
         'views/quality_view.xml',

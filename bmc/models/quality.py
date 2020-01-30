@@ -48,7 +48,8 @@ class QualityCheck(models.Model):
         required=False)
     supplier_id = fields.Many2one(related='picking_id.partner_id', string="Fournisseur")
     origin = fields.Char(related='picking_id.origin', string="Origin", store=True)
-    qty = fields.Float(compute='_compute_quantity', string="Quantité")
+    qty = fields.Float(related='picking_id.quantity_done', string="Quantité", store=True)
+    # qty = fields.Float(compute='_compute_quantity', string="Quantité")
     price_ttc = fields.Float(compute='_compute_price_ttc', string="Prix TTC")
 
     @api.depends('picking_id.move_ids_without_package')
@@ -138,6 +139,45 @@ class TriType(models.Model):
 class Picking(models.Model):
     _inherit = "stock.picking"
 
+    quantity_done = fields.Float(compute='_compute_quantity_done', string="Fait")
+    purchase_id = fields.Many2one('purchase.order', string="Commande fournisseur", readonly=True)
+    account_move_id = fields.Many2one('account.move', string="Avoir", readonly=True)
+    ticket_number = fields.Integer(string="Numéro de ticket", required=False)
+    tri = fields.Boolean(string="Besoin de tri")
+    deadline_tri = fields.Date(string="Date fin de tri")
+    expected_date = fields.Date(compute='_compute_date', string="Date prévue fin de tri")
+    approval_id = fields.Many2one('approval.request', string="Demande d'approbation")
+
+    def _compute_date(self):
+        quality_id = self.env['quality.check'].search([('picking_id', '=', self.id)])
+        if quality_id:
+            self.expected_date = datetime.date.today() + datetime.timedelta(days=quality_id.days_number)
+        else:
+            self.expected_date = None
+
+    @api.depends('move_ids_without_package')
+    def _compute_quantity_done(self):
+        move = []
+        for l in self.move_ids_without_package:
+            move.append(l.quantity_done)
+        self.quantity_done = sum(move)
+
+    def action_tri(self):
+        a = self.env['stock.move'].search([('picking_id', '=', self.id)])
+        b = a.product_id.ids
+        self.deadline_tri = datetime.date.today()
+        self.purchase_id.order_tri = True
+        for x in b:
+            c = self.env['product.product'].search([('id', '=', x)])
+            d = c.tri
+            if d == True:
+                self.tri = True
+
+    def cancel_action_tri(self):
+        self.deadline_tri = False
+        if not self.deadline_tri:
+            self.purchase_id.order_tri = False
+
     def action_done(self):
         """Changes picking state to done by processing the Stock Moves of the Picking
 
@@ -199,16 +239,87 @@ class Picking(models.Model):
         self._send_confirmation_email()
         return True
 
+    def _create_backorder(self):
 
-class StockPicking(models.Model):
-    _inherit = "stock.picking"
-
-    purchase_id = fields.Many2one('purchase.order', string="Commande fournisseur", readonly=True)
-    account_move_id = fields.Many2one('account.move', string="Avoir", readonly=True)
-    ticket_number = fields.Integer(string="Numéro de ticket", required=False)
+        """ This method is called when the user chose to create a backorder. It will create a new
+        picking, the backorder, and move the stock.moves that are not `done` or `cancel` into it.
+        """
+        backorders = self.env['stock.picking']
+        for picking in self:
+            moves_to_backorder = picking.move_lines.filtered(lambda x: x.state not in ('done', 'cancel'))
+            if moves_to_backorder:
+                backorder_picking = picking.copy({
+                    'name': '/',
+                    'move_lines': [],
+                    'move_line_ids': [],
+                    'backorder_id': picking.id
+                })
+                picking.message_post(
+                    body=_(
+                        'The backorder <a href=# data-oe-model=stock.picking data-oe-id=%d>%s</a> has been created.') % (
+                             backorder_picking.id, backorder_picking.name))
+                moves_to_backorder.write({'picking_id': backorder_picking.id})
+                moves_to_backorder.mapped('package_level_id').write({'picking_id': backorder_picking.id})
+                moves_to_backorder.mapped('move_line_ids').write({'picking_id': backorder_picking.id})
+                backorder_picking.action_assign()
+                backorders |= backorder_picking
+        return backorders
 
 
 class StockReturnPiking(models.TransientModel):
     _inherit = "stock.return.picking.line"
 
     to_refund = fields.Boolean(string="Numéro de ticket", default=False)
+
+
+class PurchaseOrder(models.Model):
+    _inherit = "purchase.order"
+
+    order_tri = fields.Boolean(string="Commande triée", default=False)
+
+
+class ApprovalCategory(models.Model):
+    _inherit = "approval.category"
+
+    multi_article = fields.Boolean(string="Saisie multi articles", default=False)
+
+
+class ApprovalRequest(models.Model):
+    _inherit = "approval.request"
+
+    approval_line_ids = fields.One2many('approval.request.line', 'request_id', string="Lignes demande")
+    employee_id = fields.Many2one('hr.employee', string="Employé", required=True)
+    department_id = fields.Many2one(related='employee_id.department_id', string="Departement", required=True)
+    picking_id = fields.Many2one('stock.picking', string="Transfert")
+    multi_article = fields.Boolean(related='category_id.multi_article', string="Saisie multi articles", store=True)
+
+
+class ApprovalRequestLine(models.Model):
+    _name = "approval.request.line"
+    _description = "Approval lines"
+
+    product_id = fields.Many2one('product.product', string="Produit")
+    request_id = fields.Many2one('approval.request', string="Demande d'approbation")
+    quantity = fields.Float(string="Quantité")
+    uom_id = fields.Many2one(related='product_id.uom_id', string="Unite de mésure", store=True)
+
+
+class SaleOrder(models.Model):
+    _inherit = "sale.order"
+
+    mrp_ids = fields.One2many('mrp.production', 'order_id', string="Production")
+    mrp_count = fields.Integer(compute='action_compute_mrp', string="Ordre de fabrication", store=True)
+
+    @api.depends('mrp_ids')
+    def action_compute_mrp(self):
+        if self.mrp_ids:
+            self.mrp_count = len(self.mrp_ids) or 0
+        else:
+            pass
+
+
+class MrpProduction(models.Model):
+    _inherit = "mrp.production"
+
+    order_id = fields.Many2one('sale.order', string="Bon de commande")
+    lost = fields.Float(string='Perte de feu')
