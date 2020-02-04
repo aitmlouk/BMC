@@ -14,6 +14,7 @@
         'views/partner_view.xml',
         'report/quality_report_template.xml',
         'report/quality_report.xml',
+        'data/mrp_data.xml',
     ],
     'installable': True,
 }

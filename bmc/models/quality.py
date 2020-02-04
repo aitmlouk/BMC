@@ -132,6 +132,34 @@ class QualityCheck(models.Model):
                 'direction_id': False,
                 'dir_validation_date': False})
 
+    def do_reject(self):
+        user_id = self.env.user
+        resp_stock = user_id.stock_responsible
+        resp_quality = user_id.quality_responsible
+        resp_tri = user_id.tri_responsible
+        resp_direction = user_id.direction
+
+        if resp_stock:
+            self.write({
+                'stock_resp': "Refusé par",
+                'stock_resp_id': user_id.id,
+                'resp_st_validation_date': datetime.date.today()})
+        if resp_quality:
+            self.write({
+                'quality_resp': "Refusé par",
+                'quality_resp_id': user_id.id,
+                'resp_qu_validation_date': datetime.date.today()})
+        if resp_tri:
+            self.write({
+                'tri_resp': "Refusé par",
+                'tri_resp_id': user_id.id,
+                'resp_tri_validation_date': datetime.date.today()})
+        if resp_direction:
+            self.write({
+                'direction': "Refusé par",
+                'direction_id': user_id.id,
+                'dir_validation_date': datetime.date.today()})
+
 
 class Scrap(models.Model):
     _name = 'bmc.scrap'
@@ -369,6 +397,13 @@ class MrpProduction(models.Model):
     picking_id = fields.Many2one('stock.picking', string="Réception achat")
     lost = fields.Float(string='Perte de feu')
     tri = fields.Boolean(string='Origine tri')
+    broyage = fields.Boolean(string='Origine broyage')
+
+    def action_broyage(self):
+        self.broyage = True
+        self.origin = 'Broyage'
+        self.name = self.env['ir.sequence'].next_by_code('mrp.production.bmc')
+        print('------', self.env['ir.sequence'].next_by_code('mrp.production.bmc'))
 
 
 class StockMoveLine(models.Model):

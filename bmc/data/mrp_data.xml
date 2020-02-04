@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="sequence_mrp_bmc_broyage" model="ir.sequence">
+            <field name="name">Broyage</field>
+            <field name="code">mrp.production.bmc</field>
+            <field name="prefix">WH/MO-BROY/</field>
+            <field name="padding">5</field>
+            <field name="number_next">1</field>
+            <field name="number_increment">1</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
+    </data>
+
+</odoo>

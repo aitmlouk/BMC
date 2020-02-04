@@ -9,6 +9,7 @@
                     <!--<button name="do_cancel" type="action" string="Valider" class="oe_highlight"/>-->
                     <button name="do_cancel" type="object" string="Annuler avis" class="oe_highlight"/>
                     <button name="do_validate" type="object" string="Valider" class="oe_highlight"/>
+                    <button name="do_reject" type="object" string="Refuser" class="oe_highlight"/>
                     <!--<button name="do_pass" type="object" class="btn-primary" attrs="{'invisible': [('quality_state', '!=', 'none')]}" string="Pass"/>
                     <button name="do_pass" type="object" attrs="{'invisible': [('quality_state', '!=', 'fail')]}" groups="quality.group_quality_manager" string="Pass"/>
                     <button name="do_fail" type="object" class="btn-primary" attrs="{'invisible': [('quality_state', '!=', 'none')]}" string="Fail"/>
@@ -173,6 +174,7 @@
             </xpath>
         </field>
     </record>
+
 
     <!-- purchase.order-->
     <record id="purchase_order_form_view_inherited_bmc" model="ir.ui.view">
@@ -356,12 +358,40 @@
                 <field name="order_id"/>
                 <field name="purchase_id"/>
                 <field name="picking_id"/>
-                <field name="tri"/>
             </xpath>
-            <xpath expr="//field[@name='bom_id']" position="after">
-                <field name="lost"/>
+            <xpath expr="//page[last()]" position="after">
+                <page string="Divers">
+                    <group>
+                        <field name="lost"/>
+                        <field name="tri"/>
+                        <field name="broyage"/>
+                    </group>
+                </page>
+            </xpath>
+            <xpath expr="//button[@name='action_confirm']" position="after">
+                <button name="action_broyage" attrs="{'invisible': ['|', ('tri', '=', True), ('broyage', '=', True)]}"
+                        string="Broyage" type="object" class="oe_highlight"/>
             </xpath>
         </field>
     </record>
+
+    <record model="ir.actions.act_window" id="action_mrp_production_op_tri">
+        <field name="name">Opérations Tri</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">mrp.production</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('tri', '=', True)]</field>
+    </record>
+    <record model="ir.actions.act_window" id="action_mrp_production_op_broyage">
+        <field name="name">Broyage</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">mrp.production</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('broyage', '=', True)]</field>
+    </record>
+    <menuitem id="menu_operation_tree" name="Opérations Tri" parent="mrp.menu_mrp_manufacturing"
+               action="action_mrp_production_op_tri"/>
+    <menuitem id="menu_operation_tree_broyage" name="Opérations Broyage" parent="mrp.menu_mrp_manufacturing"
+               action="action_mrp_production_op_broyage"/>
 
 </odoo>
