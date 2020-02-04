@@ -63,7 +63,18 @@ class QualityCheck(models.Model):
     @api.depends('picking_id')
     def _compute_price_ttc(self):
         if self.picking_id.purchase_id:
-            self.price_ttc = self.picking_id.purchase_id.amount_total
+            order_lines = self.picking_id.purchase_id.order_line
+            for l in order_lines:
+                if l.product_id == self.product_id:
+                    print(l.price_unit)
+                    print(sum(l.taxes_id))
+                    print(l.product_qty)
+                    if l.product_qty != 0:
+                        self.price_ttc = (l.price_unit + sum(l.taxes_id)) / l.product_qty
+                    else:
+                        self.price_ttc = 0
+                else:
+                    pass
 
     def do_validate(self):
         user_id = self.env.user
@@ -272,6 +283,38 @@ class StockReturnPiking(models.TransientModel):
     to_refund = fields.Boolean(string="Numéro de ticket", default=False)
 
 
+class GenerateOrder(models.TransientModel):
+    _name = "generate.mrp.production"
+    _rec_name = 'product_id'
+    _description = 'Return Picking Line'
+
+    product_id = fields.Many2one('product.product', string="Produit à fabriquer", required=True)
+    picking_id = fields.Many2one('stock.picking', string="Transfert")
+
+    def create_mrp(self):
+        # create new mrp from transfert
+        active_id = self.env.context.get('active_id', False)
+        picking_id = self.env['stock.picking'].browse(active_id)
+        data = {
+            'product_id': self.product_id.id,
+            'product_qty': 1,
+            'product_uom_id': self.product_id.uom_id.id,
+            'purchase_id': picking_id.purchase_id.id,
+            'picking_id': picking_id.id,
+        }
+        mrp_wiz = self.env['mrp.production'].create(data)
+        return {
+            'name': _('MRP'),
+            'view_type': 'form',
+            'view_mode': 'form',
+            'view_id': self.env.ref('mrp.mrp_production_form_view').id,
+            'res_model': 'mrp.production',
+            'res_id': mrp_wiz.id,
+            'type': 'ir.actions.act_window',
+            'target': 'new',
+        }
+
+
 class PurchaseOrder(models.Model):
     _inherit = "purchase.order"
 
@@ -322,4 +365,14 @@ class MrpProduction(models.Model):
     _inherit = "mrp.production"
 
     order_id = fields.Many2one('sale.order', string="Bon de commande")
+    purchase_id = fields.Many2one('purchase.order', string="Commande achat")
+    picking_id = fields.Many2one('stock.picking', string="Réception achat")
     lost = fields.Float(string='Perte de feu')
+    tri = fields.Boolean(string='Origine tri')
+
+
+class StockMoveLine(models.Model):
+    _inherit = "stock.move.line"
+
+    partner_id = fields.Many2one('res.partner', string="Fournisseur")
+    partner_product_id = fields.Many2one('product.supplier.info', string="Fournisseur/Article")

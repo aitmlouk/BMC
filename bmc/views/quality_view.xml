@@ -124,6 +124,29 @@
         </field>
     </record>
 
+
+    <!--wizard-->
+    <act_window name="Generate order" id="act_stock_mrp_generate"
+        res_model="generate.mrp.production"
+        view_mode="form" target="new"/>
+
+    <record id="view_stock_mrp_form" model="ir.ui.view">
+        <field name="name">Return lines</field>
+        <field name="model">generate.mrp.production</field>
+        <field name="arch" type="xml">
+            <form>
+                <field name="picking_id" invisible="1"/>
+                <group>
+                    <field name="product_id"/>
+                </group>
+                <footer>
+                    <button name="create_mrp" string="Tri – Ordre de fabrication" type="object" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel" />
+                </footer>
+            </form>
+        </field>
+    </record>
+
     <record id="stock_picking_form_view_inherited_bmc" model="ir.ui.view">
         <field name="name">stock.picking.form.inherit.bmc</field>
         <field name="model">stock.picking</field>
@@ -146,6 +169,7 @@
             <xpath expr="//button[@name='action_cancel']" position="after">
                 <button name="action_tri" string="Fin du Tri" attrs="{'invisible': [('state', '!=', 'done'), ('deadline_tri', '!=', ''), ('tri', '=', 'False')]}" type="object" class="oe_highlight"/>
                 <button name="cancel_action_tri" string="Annuler fin du Tri" attrs="{'invisible': [('deadline_tri', '=', '')]}" type="object" class="oe_highlight"/>
+                <button name="%(act_stock_mrp_generate)d" string="Tri – Ordre de fabrication" type="action" class="oe_highlight"/>
             </xpath>
         </field>
     </record>
@@ -330,6 +354,9 @@
         <field name="arch" type="xml">
             <xpath expr="//field[@name='origin']" position="after">
                 <field name="order_id"/>
+                <field name="purchase_id"/>
+                <field name="picking_id"/>
+                <field name="tri"/>
             </xpath>
             <xpath expr="//field[@name='bom_id']" position="after">
                 <field name="lost"/>
