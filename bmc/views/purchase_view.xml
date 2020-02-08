@@ -5,24 +5,27 @@
         <field name="model">purchase.order</field>
         <field name="inherit_id" ref="purchase.purchase_order_form"/>
         <field name="arch" type="xml">
+            <!-- Info button-->
+            <xpath expr="//button[@name='action_view_invoice']" position="after">
+                <button class="oe_stat_button" icon="fa-recycle" type="action" name="%(bmc_mrp_production_action)d" attrs="{'invisible': [('mrp_count', '=', 0)]}">
+                  <field name="mrp_count" string="Ordre de fabrication" widget="statinfo"/>
+                </button>
+            </xpath>
+            <!-- attributes-->
             <xpath expr="//field[@name='order_line']//tree//field[@name='taxes_id']" position="before">
                 <field name="discount_eva" widget="percentage"/>
             </xpath>
-
-           <!-- <xpath expr="//field[@name='order_line']//tree//field[@name='taxes_id']" position="attributes">
+            <!-- one2many tree -->
+            <xpath expr="//field[@name='order_line']//tree//field[@name='taxes_id']" position="attributes">
                 <attribute name="attrs">{'readonly': [('has_same_currency', '=', False)]}</attribute>
-            </xpath> -->
-
+            </xpath>
+            <!-- simple field-->
             <xpath expr="//field[@name='company_id']/.." position="after">
                 <group name="frais_right" string="Frais &amp; Taxes">
-                    <!-- <field name="bank_charges" class="text-right pull-right"/> -->
-                    <field name="customs_theoretical" class="text-right pull-right"/>
-                    <field name="customs" class="text-right pull-right"/>
-                    <field name="misc_costs" class="text-right pull-right"/>
                     <field name="total_dh" class="text-right pull-right"/>
                 </group>
             </xpath>
-
+            <!-- pages-->
             <page name="purchase_delivery_invoice" position="after">
                 <page name="sales_price_definition" string="Prix de vente">
                     <group>

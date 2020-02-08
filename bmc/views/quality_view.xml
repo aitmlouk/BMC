@@ -170,7 +170,7 @@
             <xpath expr="//button[@name='action_cancel']" position="after">
                 <button name="action_tri" string="Fin du Tri" attrs="{'invisible': [('state', '!=', 'done'), ('deadline_tri', '!=', ''), ('tri', '=', 'False')]}" type="object" class="oe_highlight"/>
                 <button name="cancel_action_tri" string="Annuler fin du Tri" attrs="{'invisible': [('deadline_tri', '=', '')]}" type="object" class="oe_highlight"/>
-                <button name="%(act_stock_mrp_generate)d" string="Tri – Ordre de fabrication" type="action" class="oe_highlight"/>
+                <button name="%(act_stock_mrp_generate)d" string="Tri – Ordre de fabrication"  type="action" class="oe_highlight"/>
             </xpath>
         </field>
     </record>
@@ -183,7 +183,10 @@
         <field name="inherit_id" ref="purchase.purchase_order_form"/>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='date_approve']" position="after">
-                <field name="order_tri" invisible="0"/>
+                <field name="order_tri" invisible="1"/>
+            </xpath>
+            <xpath expr="//field[@name='partner_id']" position="before">
+                <field name="product_id" invisible="0"/>
             </xpath>
         </field>
     </record>
@@ -335,6 +338,7 @@
             </field>
     </record>
 
+    <!--sale.order-->
     <record id="sale_order_form_view_inherited_bmc" model="ir.ui.view">
         <field name="name">sale.order.form.inherit.bmc</field>
         <field name="model">sale.order</field>
@@ -345,6 +349,18 @@
               <field name="mrp_count" string="Ordre de fabrication" widget="statinfo"/>
             </button>
           </xpath>
+        </field>
+    </record>
+
+        <!--sale.order-->
+    <record id="purchase_order_form_view_inherited_bmc" model="ir.ui.view">
+        <field name="name">purchase.order.form.inherit.bmc</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="purchase.purchase_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='order_line']//tree//field[@name='name']" position="after">
+                <field name="tva"/>
+            </xpath>
         </field>
     </record>
 
@@ -393,5 +409,7 @@
                action="action_mrp_production_op_tri"/>
     <menuitem id="menu_operation_tree_broyage" name="Opérations Broyage" parent="mrp.menu_mrp_manufacturing"
                action="action_mrp_production_op_broyage"/>
+
+
 
 </odoo>

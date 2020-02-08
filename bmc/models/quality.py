@@ -329,6 +329,7 @@ class GenerateOrder(models.TransientModel):
             'product_uom_id': self.product_id.uom_id.id,
             'purchase_id': picking_id.purchase_id.id,
             'picking_id': picking_id.id,
+            'tri': True,
         }
         mrp_wiz = self.env['mrp.production'].create(data)
         return {
@@ -347,6 +348,18 @@ class PurchaseOrder(models.Model):
     _inherit = "purchase.order"
 
     order_tri = fields.Boolean(string="Commande triée", default=False)
+    product_id = fields.Many2one('product.product', string="Produit")
+
+    @api.onchange('product_id')
+    def onchange_product_id(self):
+        if self.product_id:
+            sellers = self.product_id.seller_ids
+            supp = []
+            for s in sellers:
+                supp.append(s.name.id)
+            return {'domain': {
+                'partner_id': [('id', 'in', supp)]
+            }}
 
 
 class ApprovalCategory(models.Model):
@@ -403,7 +416,6 @@ class MrpProduction(models.Model):
         self.broyage = True
         self.origin = 'Broyage'
         self.name = self.env['ir.sequence'].next_by_code('mrp.production.bmc')
-        print('------', self.env['ir.sequence'].next_by_code('mrp.production.bmc'))
 
 
 class StockMoveLine(models.Model):
@@ -411,3 +423,20 @@ class StockMoveLine(models.Model):
 
     partner_id = fields.Many2one('res.partner', string="Fournisseur")
     partner_product_id = fields.Many2one('product.supplier.info', string="Fournisseur/Article")
+
+
+class PurchaseOrderLine(models.Model):
+    _inherit = "purchase.order.line"
+
+    tva = fields.Boolean(string='TVA')
+
+    @api.onchange('tva', 'product_id')
+    def onchange_tva(self):
+        if self.product_id:
+            if self.product_id.raw_materials and self.tva is True:
+                print('Product TVA')
+                self.taxes_id = self.product_id.supplier_taxes_id
+            elif self.product_id.raw_materials and self.tva is not True:
+                print('EXO TVA- is not true')
+                self.taxes_id = None
+                self.taxes_id = (110, 110)
