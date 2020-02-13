@@ -66,11 +66,8 @@ class QualityCheck(models.Model):
             order_lines = self.picking_id.purchase_id.order_line
             for l in order_lines:
                 if l.product_id == self.product_id:
-                    print(l.price_unit)
-                    print(sum(l.taxes_id))
-                    print(l.product_qty)
                     if l.product_qty != 0:
-                        self.price_ttc = (l.price_unit + sum(l.taxes_id)) / l.product_qty
+                        self.price_ttc = (l.price_unit + l.taxes_id[0].amount) / l.product_qty
                     else:
                         self.price_ttc = 0
                 else:
