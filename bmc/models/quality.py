@@ -436,4 +436,4 @@ class PurchaseOrderLine(models.Model):
             elif self.product_id.raw_materials and self.tva is not True:
                 print('EXO TVA- is not true')
                 self.taxes_id = None
-                self.taxes_id = (110, 110)
+                self.taxes_id = (432, 432)
