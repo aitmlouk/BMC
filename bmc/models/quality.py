@@ -62,16 +62,20 @@ class QualityCheck(models.Model):
 
     @api.depends('picking_id')
     def _compute_price_ttc(self):
-        if self.picking_id.purchase_id:
-            order_lines = self.picking_id.purchase_id.order_line
-            for l in order_lines:
-                if l.product_id == self.product_id:
-                    if l.product_qty != 0:
-                        self.price_ttc = (l.price_unit + l.taxes_id[0].amount) / l.product_qty
+        if self.price_ttc:
+
+            if self.picking_id.purchase_id:
+                order_lines = self.picking_id.purchase_id.order_line
+                for l in order_lines:
+                    if l.product_id == self.product_id:
+                        if l.product_qty != 0:
+                            self.price_ttc = (l.price_subtotal + l.price_tax) / l.product_qty
+                        else:
+                            self.price_ttc = 0
                     else:
-                        self.price_ttc = 0
-                else:
-                    pass
+                        pass
+        else:
+            pass
 
     def do_validate(self):
         user_id = self.env.user
@@ -187,7 +191,8 @@ class Picking(models.Model):
     def _compute_date(self):
         quality_id = self.env['quality.check'].search([('picking_id', '=', self.id)])
         if quality_id:
-            self.expected_date = datetime.date.today() + datetime.timedelta(days=quality_id.days_number)
+            rec = quality_id[0]
+            self.expected_date = datetime.date.today() + datetime.timedelta(days=rec.days_number)
         else:
             self.expected_date = None
 
@@ -337,7 +342,6 @@ class GenerateOrder(models.TransientModel):
             'res_model': 'mrp.production',
             'res_id': mrp_wiz.id,
             'type': 'ir.actions.act_window',
-            'target': 'new',
         }
 
 
@@ -345,12 +349,12 @@ class PurchaseOrder(models.Model):
     _inherit = "purchase.order"
 
     order_tri = fields.Boolean(string="Commande triée", default=False)
-    product_id = fields.Many2one('product.product', string="Produit")
+    domain_product_id = fields.Many2one('product.product', string="Article")
 
-    @api.onchange('product_id')
-    def onchange_product_id(self):
-        if self.product_id:
-            sellers = self.product_id.seller_ids
+    @api.onchange('domain_product_id')
+    def onchange_domain_product_id(self):
+        if self.domain_product_id:
+            sellers = self.domain_product_id.seller_ids
             supp = []
             for s in sellers:
                 supp.append(s.name.id)
@@ -431,9 +435,14 @@ class PurchaseOrderLine(models.Model):
     def onchange_tva(self):
         if self.product_id:
             if self.product_id.raw_materials and self.tva is True:
-                print('Product TVA')
                 self.taxes_id = self.product_id.supplier_taxes_id
             elif self.product_id.raw_materials and self.tva is not True:
-                print('EXO TVA- is not true')
                 self.taxes_id = None
-                self.taxes_id = (432, 432)
+                #self.taxes_id = (432, 432)
+                self.taxes_id = (110, 110)
+
+
+class MrpBom(models.Model):
+    _inherit = "mrp.bom"
+
+    tri = fields.Boolean(string="Tri")

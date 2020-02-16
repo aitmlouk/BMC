@@ -10,9 +10,9 @@
                     <button name="do_cancel" type="object" string="Annuler avis" class="oe_highlight"/>
                     <button name="do_validate" type="object" string="Valider" class="oe_highlight"/>
                     <button name="do_reject" type="object" string="Refuser" class="oe_highlight"/>
-                    <!--<button name="do_pass" type="object" class="btn-primary" attrs="{'invisible': [('quality_state', '!=', 'none')]}" string="Pass"/>
-                    <button name="do_pass" type="object" attrs="{'invisible': [('quality_state', '!=', 'fail')]}" groups="quality.group_quality_manager" string="Pass"/>
-                    <button name="do_fail" type="object" class="btn-primary" attrs="{'invisible': [('quality_state', '!=', 'none')]}" string="Fail"/>
+                    <button name="do_pass" type="object" class="btn-primary" string="Pass"/>
+                    <button name="do_fail" type="object" class="btn-primary" string="Fail"/>
+                    <!--<button name="do_fail" type="object" class="btn-primary" attrs="{'invisible': [('quality_state', '!=', 'none')]}" string="Fail"/>
                     <button name="do_fail" type="object" attrs="{'invisible': [('quality_state', '!=', 'pass')]}" groups="quality.group_quality_manager" string="Fail"/>
                     -->
                     <button name="do_alert" type="object" attrs="{'invisible': ['|', ('alert_ids', '!=', []), ('quality_state', '!=', 'pass')]}" string="Make Alert"/>
@@ -141,7 +141,7 @@
                     <field name="product_id"/>
                 </group>
                 <footer>
-                    <button name="create_mrp" string="Tri – Ordre de fabrication" type="object" class="btn-primary"/>
+                    <button name="create_mrp" string="Fiche de tri" type="object" class="btn-primary"/>
                     <button string="Cancel" class="btn-secondary" special="cancel" />
                 </footer>
             </form>
@@ -159,8 +159,7 @@
             </xpath>
             <xpath expr="//field[@name='origin']" position="after">
                 <field name="purchase_id"/>
-                <field name="account_move_id"/>
-                <field name="approval_id"/>
+                <field name="approval_id" invisible="1"/>
             </xpath>
             <xpath expr="//field[@name='group_id']" position="after">
                 <field name="tri" invisible="0" readonly="1"/>
@@ -170,26 +169,11 @@
             <xpath expr="//button[@name='action_cancel']" position="after">
                 <button name="action_tri" string="Fin du Tri" attrs="{'invisible': [('state', '!=', 'done'), ('deadline_tri', '!=', ''), ('tri', '=', 'False')]}" type="object" class="oe_highlight"/>
                 <button name="cancel_action_tri" string="Annuler fin du Tri" attrs="{'invisible': [('deadline_tri', '=', '')]}" type="object" class="oe_highlight"/>
-                <button name="%(act_stock_mrp_generate)d" string="Tri – Ordre de fabrication"  type="action" class="oe_highlight"/>
+                <button name="%(act_stock_mrp_generate)d" string="Fiche de tri"  type="action" class="oe_highlight"/>
             </xpath>
         </field>
     </record>
 
-
-    <!-- purchase.order-->
-    <record id="purchase_order_form_view_inherited_bmc" model="ir.ui.view">
-        <field name="name">purchase.order.form.inherit.bmc</field>
-        <field name="model">purchase.order</field>
-        <field name="inherit_id" ref="purchase.purchase_order_form"/>
-        <field name="arch" type="xml">
-            <xpath expr="//field[@name='date_approve']" position="after">
-                <field name="order_tri" invisible="1"/>
-            </xpath>
-            <xpath expr="//field[@name='partner_id']" position="before">
-                <field name="product_id" invisible="0"/>
-            </xpath>
-        </field>
-    </record>
 
     <!-- Approval.category-->
     <record id="app_categ_form_view_inherited_bmc" model="ir.ui.view">
@@ -358,6 +342,12 @@
         <field name="model">purchase.order</field>
         <field name="inherit_id" ref="purchase.purchase_order_form"/>
         <field name="arch" type="xml">
+            <xpath expr="//field[@name='date_approve']" position="after">
+                <field name="order_tri" invisible="1"/>
+            </xpath>
+            <xpath expr="//field[@name='partner_id']" position="before">
+                <field name="domain_product_id"/>
+            </xpath>
             <xpath expr="//field[@name='order_line']//tree//field[@name='name']" position="after">
                 <field name="tva"/>
             </xpath>
@@ -478,5 +468,17 @@
 
     <menuitem id="menu_effic_tree" name="Efficacité fournisseur" parent="stock.menu_stock_root"
                action="action_supp_effic"/>
+
+    <!--mrp.bom-->
+    <record id="mrp_bom_form_view_inherited_bmc" model="ir.ui.view">
+        <field name="name">mrp.bom.form.inherit.bmc</field>
+        <field name="model">mrp.bom</field>
+        <field name="inherit_id" ref="mrp.mrp_bom_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='consumption']" position="after">
+                <field name="tri"/>
+            </xpath>
+        </field>
+    </record>
 
 </odoo>

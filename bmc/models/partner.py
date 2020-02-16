@@ -25,10 +25,6 @@ class Product(models.Model):
                                    help="Materials")
     tri = fields.Boolean(string="Besoin d\'un tri",
                          help="Tri")
-    quality_id = fields.Many2one("quality.point",
-                                 string="Point de controle",
-                                 help="Control point"
-                                 )
     define_product = fields.Boolean(string="Produit fini", default=False)
 
     @api.onchange('raw_materials')

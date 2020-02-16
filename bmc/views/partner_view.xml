@@ -31,6 +31,10 @@
             <xpath expr="//field[@name='category_id']" position="attributes">
                 <attribute name="attrs">{'invisible': ['&amp;',('company_type', '!=', 'company'),('parent_id', '=', False)]}</attribute>
             </xpath>
+
+            <xpath expr="//field[@name='property_product_pricelist']" position="after">
+                <field name="currency_id" readonly="0"/>
+            </xpath>
         </field>
     </record>
 
@@ -70,7 +74,6 @@
                     <group col="2">
                         <field name="raw_materials"/>
                         <field name="tri"/>
-                        <field name="quality_id"/>
                         <field name="define_product"/>
                     </group>
                 </page>
