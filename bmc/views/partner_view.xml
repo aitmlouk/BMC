@@ -32,7 +32,7 @@
                 <attribute name="attrs">{'invisible': ['&amp;',('company_type', '!=', 'company'),('parent_id', '=', False)]}</attribute>
             </xpath>
 
-            <xpath expr="//field[@name='property_product_pricelist']" position="after">
+            <xpath expr="//field[@name='property_payment_term_id']" position="after">
                 <field name="currency_id" readonly="0"/>
             </xpath>
         </field>
