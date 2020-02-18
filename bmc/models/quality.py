@@ -62,20 +62,16 @@ class QualityCheck(models.Model):
 
     @api.depends('picking_id')
     def _compute_price_ttc(self):
-        if self.price_ttc:
-
+        if self.picking_id:
             if self.picking_id.purchase_id:
                 order_lines = self.picking_id.purchase_id.order_line
                 for l in order_lines:
                     if l.product_id == self.product_id:
-                        if l.product_qty != 0:
-                            self.price_ttc = (l.price_subtotal + l.price_tax) / l.product_qty
-                        else:
-                            self.price_ttc = 0
+                        self.price_ttc = (l.price_subtotal + l.price_tax) / l.product_qty
                     else:
-                        pass
+                        self.price_ttc = 0
         else:
-            pass
+            self.price_ttc = 0
 
     def do_validate(self):
         user_id = self.env.user
