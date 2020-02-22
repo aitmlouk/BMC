@@ -434,8 +434,8 @@ class PurchaseOrderLine(models.Model):
                 self.taxes_id = self.product_id.supplier_taxes_id
             elif self.product_id.raw_materials and self.tva is not True:
                 self.taxes_id = None
-                self.taxes_id = (147, 147)
-                #self.taxes_id = (110, 110)
+                #self.taxes_id = (147, 147)
+                self.taxes_id = (110, 110)
 
 
 class MrpBom(models.Model):

@@ -7,48 +7,54 @@
                 <div class="page">
                     <center style="font-size:22px">Système de Management de la Qualité</center>
                     <center style="font-size:19px">Réception de Ferraille</center>
-             <hr style="color:black; background-color:firebrick; height:3px;" />
+             <hr/>
               <br/>
 
 			<table class="table table-bordered">
 			  <tr>
 			    <td >Ticket N: <span t-field="o.ticket_number"/></td>
-			    <td >Prix: <span t-field="o.price_ttc"/></td>
+                <td >Date de réception: <span t-field="o.received_date"/></td>
+
+			 </tr>
+			</table>
+
+            <table class="table table-bordered">
+			  <tr>
+			  	<td>Type de ferraille réceptionnée: <span t-field="o.product_id.name"/></td>
+			    <td>Qualité de ferraille: <span t-field="o.scrap_id.name"/></td>
 			 </tr>
 			  <tr>
-			  	<td >Date de réception: <span t-field="o.received_date"/></td>
-			    <td >Qualité de ferraille: <span t-field="o.scrap_id.name"/></td>
-			 </tr>
-			  <tr>
-			  	<td >Fournisseur : <span t-field="o.supplier_id.name"/></td>
-			  	<td > Type de Tri : <span t-field="o.tri_type_id.name"/></td>
+			  	<td>Fournisseur : <span t-field="o.supplier_id.name"/></td>
+			  	<td>Type de Tri : <span t-field="o.tri_type_id.name"/></td>
 			  </tr>
 			</table>
 
             <table class="table table-bordered">
                 <tr>
-			  	<td >Poids net (KG) : </td>
+			  	<td>Poids net (KG) : </td>
 
 			  </tr>
 			  <tr>
-			    <td >Exterieur</td>
-			  	<td >BMC</td>
+			    <td>Exterieur</td>
+			  	<td></td>
 			 </tr>
                 <tr>
-			    <td > --</td>
-			  	<td > --</td>
+			    <td>BMC</td>
+			  	<td><span t-field="o.qty"/></td>
 			 </tr>
 			</table>
 
-
             <table class="table table-bordered">
+                Commentaire suite au contrôle visuel:
                <tr>
-                 <td ><p><center><u>Commentaire suite au contrôle visuel:</u></center></p>
-                 <span t-field="o.control_comment"/></td>
+                 <td><span t-field="o.control_comment"/></td>
                 </tr>
+            </table>
+
+            <table class="table table-bordered">
+                Commentaire suite a l'analyse chimique:
                 <tr>
-                 <td ><p><center><u>Commentaire suite a l'analyse chimique:</u></center></p>
-                 <span t-field="o.chimique_comment"/></td>
+                 <td><span t-field="o.chimique_comment"/></td>
                 </tr>
             </table>
 
