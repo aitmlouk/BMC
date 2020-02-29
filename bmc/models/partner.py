@@ -37,9 +37,11 @@ class ProductSupplierInfo(models.Model):
     _inherit = "product.supplierinfo"
 
     move_ids = fields.One2many('stock.move', 'partner_id2', string="Mouvement de stock reception",
-                               domain="['&',['state','=','done'],['picking_type_id.name','ilike','Réception']]")
-    move_return_ids = fields.One2many('stock.move', 'partner_id2', string="Mouvement de stock retour")
-    move_prod_ids = fields.One2many('stock.move.line', 'partner_id2', string="Mouvement de stock prod")
+                               domain=['&',('state','=','done'),('picking_type_id.name','ilike','Réception')])
+    move_return_ids = fields.One2many('stock.move', 'partner_id2', string="Mouvement de stock retour",
+                                      domain=['&',('state','=','done'),('picking_type_id.name','ilike','Retour')])
+    move_prod_ids = fields.One2many('stock.move.line', 'partner_id2', string="Mouvement de stock prod",
+                                    domain=[('partner_id2', '!=', False)])
     qty_livre = fields.Float(string="Quantités livrées", compute='action_compute_qty_livre')
     qty_retour = fields.Float(string="Retours", compute='action_compute_qty_retour')
     qty_prod = fields.Float(string="Produits -Tri", compute='action_compute_qty_prod')
@@ -47,61 +49,66 @@ class ProductSupplierInfo(models.Model):
 
     @api.depends('move_ids')
     def action_compute_qty_livre(self):
-        total = 0.0
-        for line in self.move_ids:
-            total += line.quantity_done
-        print('-------Total', total)
-        self.qty_livre = total
+        for rec in self:
+            total = 0.0
+            for line in rec.move_ids:
+                total += line.quantity_done
+            print('-------qty_livre', total)
+            rec.qty_livre = total
+            print('-------qty_livre', rec.qty_livre)
 
     @api.depends('move_return_ids')
     def action_compute_qty_retour(self):
-        total = 0.0
-        for line in self.move_return_ids:
-            total += line.quantity_done
-        print('-------Total', total)
-        self.qty_retour = total
+        for rec in self:
+            total = 0.0
+            for line in rec.move_return_ids:
+                total += line.quantity_done
+            rec.qty_retour = total
+            print('qty_retour', rec.qty_retour)
 
     @api.depends('move_prod_ids')
     def action_compute_qty_prod(self):
-        total = 0.0
-        for line in self.move_prod_ids:
-            total += line.qty_done
-        print('-------Total', total)
-        self.qty_prod = total
+        for rec in self:
+            total = 0.0
+            for line in rec.move_prod_ids:
+                total += line.qty_done
+            rec.qty_prod = total
+            print('qty_prod', rec.qty_prod)
 
     @api.depends('move_ids', 'move_return_ids', 'move_prod_ids')
     def action_compute_taux_efficacite(self):
-        print('-------START')
-        if self.move_ids and self.move_prod_ids and self.move_return_ids:
-            print('-------AFTER TEST')
-            total = 0.0
-            for line in self.move_ids:
-                total += line.quantity_done
+        for rec in self:
+            print('-------START')
+            if rec.move_ids and rec.move_prod_ids and rec.move_return_ids:
+                print('-------AFTER TEST')
+                total = 0.0
+                for line in rec.move_ids:
+                    total += line.quantity_done
 
-            print('-------TOTAL', total)
-            total1 = 0.0
-            for line in self.move_return_ids:
-                total1 += line.quantity_done
-            print('-------TOTAL1', total1)
+                print('-------TOTAL', total)
+                total1 = 0.0
+                for line in rec.move_return_ids:
+                    total1 += line.quantity_done
+                print('-------TOTAL1', total1)
 
-            total2 = 0.0
-            for line in self.move_prod_ids:
-                total2 += line.qty_done
-                if total > 0:
-                    self.taux_efficacite = ((total - total1 - total2) * 100) / total
-                else:
-                    self.taux_efficacite = 0
-            print('-------TOTAL2', total2)
-        else:
-            self.taux_efficacite = None
-            #print('-------NOTHING', self.taux_efficacite)
+                total2 = 0.0
+                for line in rec.move_prod_ids:
+                    total2 += line.qty_done
+                    if total > 0:
+                        rec.taux_efficacite = ((total - total1 - total2) * 100) / total
+                    else:
+                        rec.taux_efficacite = 0
+                print('-------TOTAL2', total2)
+            else:
+                rec.taux_efficacite = None
+                #print('-------NOTHING', self.taux_efficacite)
 
 
 class StockMove(models.Model):
     _inherit = "stock.move"
 
-    partner_id1 = fields.Many2one('res.partner', string="Fournisseur", domain="[('state','=','done')]")
-    partner_id2 = fields.Many2one('product.supplierinfo', string="Fournisseur/Article", domain="[('state','=','done')]")
+    partner_id1 = fields.Many2one('res.partner', string="Fournisseur", domain=[('state','=','done')])
+    partner_id2 = fields.Many2one('product.supplierinfo', string="Fournisseur/Article", domain=[('state','=','done')])
 
 
 class StockMoveLine(models.Model):
