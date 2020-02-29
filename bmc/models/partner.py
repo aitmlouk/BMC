@@ -50,6 +50,7 @@ class ProductSupplierInfo(models.Model):
         total = 0.0
         for line in self.move_ids:
             total += line.quantity_done
+        print('-------Total', total)
         self.qty_livre = total
 
     @api.depends('move_return_ids')
@@ -57,6 +58,7 @@ class ProductSupplierInfo(models.Model):
         total = 0.0
         for line in self.move_return_ids:
             total += line.quantity_done
+        print('-------Total', total)
         self.qty_retour = total
 
     @api.depends('move_prod_ids')
@@ -64,17 +66,24 @@ class ProductSupplierInfo(models.Model):
         total = 0.0
         for line in self.move_prod_ids:
             total += line.qty_done
+        print('-------Total', total)
         self.qty_prod = total
 
     @api.depends('move_ids', 'move_return_ids', 'move_prod_ids')
     def action_compute_taux_efficacite(self):
-        if self.move_ids:
+        print('-------START')
+        if self.move_ids and self.move_prod_ids and self.move_return_ids:
+            print('-------AFTER TEST')
             total = 0.0
             for line in self.move_ids:
                 total += line.quantity_done
+
+            print('-------TOTAL', total)
             total1 = 0.0
             for line in self.move_return_ids:
                 total1 += line.quantity_done
+            print('-------TOTAL1', total1)
+
             total2 = 0.0
             for line in self.move_prod_ids:
                 total2 += line.qty_done
@@ -82,8 +91,10 @@ class ProductSupplierInfo(models.Model):
                     self.taux_efficacite = ((total - total1 - total2) * 100) / total
                 else:
                     self.taux_efficacite = 0
+            print('-------TOTAL2', total2)
         else:
-            self.taux_efficacite = 0
+            self.taux_efficacite = None
+            #print('-------NOTHING', self.taux_efficacite)
 
 
 class StockMove(models.Model):
