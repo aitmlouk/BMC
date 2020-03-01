@@ -53,9 +53,7 @@ class ProductSupplierInfo(models.Model):
             total = 0.0
             for line in rec.move_ids:
                 total += line.quantity_done
-            print('-------qty_livre', total)
             rec.qty_livre = total
-            print('-------qty_livre', rec.qty_livre)
 
     @api.depends('move_return_ids')
     def action_compute_qty_retour(self):
@@ -64,7 +62,6 @@ class ProductSupplierInfo(models.Model):
             for line in rec.move_return_ids:
                 total += line.quantity_done
             rec.qty_retour = total
-            print('qty_retour', rec.qty_retour)
 
     @api.depends('move_prod_ids')
     def action_compute_qty_prod(self):
@@ -73,35 +70,26 @@ class ProductSupplierInfo(models.Model):
             for line in rec.move_prod_ids:
                 total += line.qty_done
             rec.qty_prod = total
-            print('qty_prod', rec.qty_prod)
 
     @api.depends('move_ids', 'move_return_ids', 'move_prod_ids')
     def action_compute_taux_efficacite(self):
         for rec in self:
-            print('-------START')
-            if rec.move_ids and rec.move_prod_ids and rec.move_return_ids:
-                print('-------AFTER TEST')
                 total = 0.0
                 for line in rec.move_ids:
                     total += line.quantity_done
 
-                print('-------TOTAL', total)
                 total1 = 0.0
                 for line in rec.move_return_ids:
                     total1 += line.quantity_done
-                print('-------TOTAL1', total1)
 
                 total2 = 0.0
                 for line in rec.move_prod_ids:
                     total2 += line.qty_done
-                    if total > 0:
-                        rec.taux_efficacite = ((total - total1 - total2) * 100) / total
-                    else:
-                        rec.taux_efficacite = 0
-                print('-------TOTAL2', total2)
-            else:
-                rec.taux_efficacite = None
-                #print('-------NOTHING', self.taux_efficacite)
+
+                if total > 0:
+                    rec.taux_efficacite = ((total - total1 - total2) * 100) / total
+                else:
+                    rec.taux_efficacite = 0.0
 
 
 class StockMove(models.Model):
