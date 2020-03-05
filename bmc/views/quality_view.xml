@@ -7,11 +7,11 @@
             <form>
                 <header>
                     <!--<button name="do_cancel" type="action" string="Valider" class="oe_highlight"/>-->
-                    <button name="do_cancel" type="object" string="Annuler avis" class="oe_highlight"/>
-                    <button name="do_validate" type="object" string="Valider" class="oe_highlight"/>
-                    <button name="do_reject" type="object" string="Refuser" class="oe_highlight"/>
-                    <button name="do_pass" type="object" class="btn-primary" string="Pass"/>
-                    <button name="do_fail" type="object" class="btn-primary" string="Fail"/>
+                    <button name="do_cancel" type="object" string="Annuler avis" class="oe_highlight" attrs="{'invisible': [('direction_ok', '!=', False)]}"/>
+                    <button name="do_validate" type="object" string="Valider" class="oe_highlight" attrs="{'invisible': [('direction_ok', '!=', False)]}"/>
+                    <button name="do_reject" type="object" string="Refuser" class="oe_highlight" attrs="{'invisible': [('direction_ok', '!=', False)]}"/>
+                    <button name="do_pass" type="object" class="btn-primary" string="Pass" attrs="{'invisible': [('direction_ok', '=', False)]}"/>
+                    <button name="do_fail" type="object" class="btn-primary" string="Fail" attrs="{'invisible': [('direction_ok', '=', False)]}"/>
                     <!--<button name="do_fail" type="object" class="btn-primary" attrs="{'invisible': [('quality_state', '!=', 'none')]}" string="Fail"/>
                     <button name="do_fail" type="object" attrs="{'invisible': [('quality_state', '!=', 'pass')]}" groups="quality.group_quality_manager" string="Fail"/>
                     -->
@@ -39,6 +39,7 @@
                             <field name="price_ttc"/>
                             <field name="supplier_id"/>
                             <field name="origin"/>
+                            <field name="direction_ok" invisible="1"/>
 
                             <field name="devise_id" invisible="1"/>
                             <field name="lot_id" groups="stock.group_production_lot"/>
@@ -480,5 +481,36 @@
             </xpath>
         </field>
     </record>
+
+    <!-- purchase tree -->
+    <record id="purchase.purchase_order_tree" model="ir.ui.view">
+            <field name="name">purchase.order.tree</field>
+            <field name="model">purchase.order</field>
+            <field name="arch" type="xml">
+                <tree string="Purchase Order" multi_edit="1" decoration-danger="state=='purchase' and order_tri==False"
+                        decoration-bf="state=='purchase' and order_tri==False" decoration-muted="state=='cancel'"
+                        decoration-info="state in ('wait','confirmed')" class="o_purchase_order">
+
+                    <field name="message_unread" invisible="1"/>
+                    <field name="partner_ref" optional="hide"/>
+                    <field name="name" string="Reference" readonly="1"/>
+                    <field name="date_order" invisible="not context.get('quotation_only', False)" optional="show"/>
+                    <field name="date_approve" invisible="context.get('quotation_only', False)" optional="show"/>
+                    <field name="partner_id" readonly="1"/>
+                    <field name="company_id" readonly="1" options="{'no_create': True}"
+                        groups="base.group_multi_company" optional="show"/>
+                    <field name="date_planned" invisible="context.get('quotation_only', False)" optional="show"/>
+                    <field name="user_id" optional="show"/>
+                    <field name="origin" optional="show"/>
+                    <field name="amount_untaxed" sum="Total Untaxed amount" string="Untaxed" widget="monetary" optional="hide"/>
+                    <field name="amount_total" sum="Total amount" widget="monetary" optional="show"/>
+                    <field name="currency_id" invisible="1"/>
+                    <field name="state" optional="show"/>
+                    <field name="order_tri" invisible="1" />
+                    <field name="invoice_status" attrs="{'column_invisible': [('parent.state', 'not in', ('purchase', 'done'))]}"/>
+                    <field name="activity_exception_decoration" widget="activity_exception"/>
+                </tree>
+            </field>
+        </record>
 
 </odoo>

@@ -2,6 +2,7 @@
 
 from odoo import api, fields, models, SUPERUSER_ID, _
 import datetime
+from datetime import datetime
 from odoo.osv import expression
 from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT
 from odoo.tools.float_utils import float_compare, float_is_zero, float_round
@@ -52,6 +53,10 @@ class QualityCheck(models.Model):
     # qty = fields.Float(compute='_compute_quantity', string="Quantité")
     price_ttc = fields.Float(compute='_compute_price_ttc', string="Prix TTC")
 
+    user_id = fields.Many2one('res.users', string="User", default=lambda self: self.env.user)
+    direction_ok = fields.Boolean(related='user_id.direction', string="Direction Ok")
+
+
     @api.depends('picking_id.move_ids_without_package')
     def _compute_quantity(self):
         qty = 0.0
@@ -100,6 +105,27 @@ class QualityCheck(models.Model):
                 'direction': "Approuvé par",
                 'direction_id': user_id.id,
                 'dir_validation_date': datetime.date.today()})
+
+    def do_pass(self):
+        user_id = self.env.user
+        self.write({'quality_state': 'pass',
+                    'direction': "Approuvé par",
+                    'user_id': self.env.user.id,
+                    'direction_id': user_id.id,
+                    'dir_validation_date': datetime.today(),
+                    'control_date': datetime.now()})
+        return self.redirect_after_pass_fail()
+
+    def do_fail(self):
+        user_id = self.env.user
+        self.write({
+            'quality_state': 'fail',
+            'direction': "Réfusé par",
+            'user_id': self.env.user.id,
+            'direction_id': user_id.id,
+            'dir_validation_date': datetime.today(),
+            'control_date': datetime.now()})
+        return self.redirect_after_pass_fail()
 
     def do_cancel(self):
         user_id = self.env.user
