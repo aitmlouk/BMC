@@ -60,8 +60,8 @@
 
             <table class="table table-bordered">
                <tr>
-                 <td ><span t-field="o.picture_1"/></td>
-                   <td ><span t-field="o.picture_1"/></td>
+                 <td ><img t-attf-src="data:image/jpg;base64,{{o.picture_1}}" style="align:center; width:80%;height:30%;"/></td>
+                 <td ><img t-attf-src="data:image/jpg;base64,{{o.picture_2}}" style="align:center; width:80%;height:30%;"/></td>
                 </tr>
             </table>
 
