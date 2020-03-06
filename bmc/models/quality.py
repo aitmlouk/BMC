@@ -2,7 +2,6 @@
 
 from odoo import api, fields, models, SUPERUSER_ID, _
 import datetime
-from datetime import datetime
 from odoo.osv import expression
 from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT
 from odoo.tools.float_utils import float_compare, float_is_zero, float_round
@@ -112,7 +111,7 @@ class QualityCheck(models.Model):
                     'direction': "Approuvé par",
                     'user_id': self.env.user.id,
                     'direction_id': user_id.id,
-                    'dir_validation_date': datetime.today(),
+                    'dir_validation_date': datetime.date.today(),
                     'control_date': datetime.now()})
         return self.redirect_after_pass_fail()
 
@@ -123,7 +122,7 @@ class QualityCheck(models.Model):
             'direction': "Réfusé par",
             'user_id': self.env.user.id,
             'direction_id': user_id.id,
-            'dir_validation_date': datetime.today(),
+            'dir_validation_date': datetime.date.today(),
             'control_date': datetime.now()})
         return self.redirect_after_pass_fail()
 
