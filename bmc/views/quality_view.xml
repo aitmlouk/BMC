@@ -36,7 +36,12 @@
                                 <field name="qty"/>
                                 <field name="uom_id" options="{'no_open': True, 'no_create': True}"/>
                             </div>
-                            <field name="price_ttc"/>
+                            <label for="price_ttc"/>
+                             <div class="o_row">
+                                <field name="price_ttc"/>
+                                <field name="currency_id" options="{'no_open': True, 'no_create': True}"/>
+                            </div>
+
                             <field name="supplier_id"/>
                             <field name="origin"/>
                             <field name="direction_ok" invisible="1"/>
@@ -156,6 +161,9 @@
         <field name="arch" type="xml">
             <xpath expr="//field[@name='picking_type_id']" position="after">
                 <field name="ticket_number"/>
+                <field name="pesage_externe"/>
+                <field name="supplier_raw" invisible="0"/>
+
                 <field name="quantity_done" invisible="1"/>
             </xpath>
             <xpath expr="//field[@name='origin']" position="after">
@@ -168,9 +176,9 @@
                 <field name="deadline_tri" readonly="1"/>
             </xpath>
             <xpath expr="//button[@name='action_cancel']" position="after">
-                <button name="action_tri" string="Fin du Tri" attrs="{'invisible': [('state', '!=', 'done'), ('deadline_tri', '!=', ''), ('tri', '=', 'False')]}" type="object" class="oe_highlight"/>
-                <button name="cancel_action_tri" string="Annuler fin du Tri" attrs="{'invisible': [('deadline_tri', '=', '')]}" type="object" class="oe_highlight"/>
-                <button name="%(act_stock_mrp_generate)d" string="Fiche de tri"  type="action" class="oe_highlight"/>
+                <button name="action_tri" string="Fin du Tri" attrs="{'invisible': [('picking_type_id', '!=', 1),('supplier_raw', '!=', 1)]}" type="object" class="oe_highlight"/>
+                <button name="cancel_action_tri" string="Annuler fin du Tri" attrs="{'invisible': [('picking_type_id', '!=', 1),('supplier_raw', '!=', 1)]}" type="object" class="oe_highlight"/>
+                <button name="%(act_stock_mrp_generate)d" string="Fiche de tri"  attrs="{'invisible': [('picking_type_id', '!=', 1),('supplier_raw', '!=', 1)]}" type="action" class="oe_highlight"/>
             </xpath>
         </field>
     </record>

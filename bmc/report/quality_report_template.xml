@@ -12,8 +12,8 @@
 
 			<table class="table table-bordered">
 			  <tr>
-			    <td >Ticket N: <span t-field="o.ticket_number"/></td>
-                <td >Date de réception: <span t-field="o.received_date"/></td>
+			    <td >Ticket n°: <span t-field="o.ticket_number"/></td>
+                <td >Date de réception: <span t-field="o.picking_id.date_done"/></td>
 
 			 </tr>
 			</table>
@@ -36,7 +36,7 @@
 			  </tr>
 			  <tr>
 			    <td>Exterieur</td>
-			  	<td></td>
+			  	<td><span t-field="o.picking_id.pesage_externe"/></td>
 			 </tr>
                 <tr>
 			    <td>BMC</td>

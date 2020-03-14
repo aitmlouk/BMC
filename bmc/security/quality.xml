@@ -1,4 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+ 		<record id="group_bmc_user" model="res.groups">
+			<field name="name">BMC-user</field>
+		</record>
 
+		<record id="group_bmc_manager" model="res.groups">
+			<field name="name">BMC-manager</field>
+		</record>
 </odoo>

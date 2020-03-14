@@ -10,6 +10,7 @@
                 'quality_control','approvals', 'sale', 'mrp'],
     'data': [
         'security/ir.model.access.csv',
+        'security/quality.xml',
         'views/quality_view.xml',
         'views/partner_view.xml',
         'report/quality_report_template.xml',

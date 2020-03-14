@@ -49,20 +49,22 @@ class QualityCheck(models.Model):
     supplier_id = fields.Many2one(related='picking_id.partner_id', string="Fournisseur")
     origin = fields.Char(related='picking_id.origin', string="Origin", store=True)
     qty = fields.Float(related='picking_id.quantity_done', string="Quantité", store=True)
-    # qty = fields.Float(compute='_compute_quantity', string="Quantité")
+    currency_id = fields.Many2one(related='picking_id.purchase_id.currency_id', string="Devise", store=True)
+    #uom_id = fields.Many2one(related='picking_id.product_uom', string="Unite", store=True)
+    uom_id = fields.Many2one('uom.uom', compute='_compute_uom', string="UOM")
     price_ttc = fields.Float(compute='_compute_price_ttc', string="Prix TTC")
-
     user_id = fields.Many2one('res.users', string="User", default=lambda self: self.env.user)
     direction_ok = fields.Boolean(related='user_id.direction', string="Direction Ok")
 
 
     @api.depends('picking_id.move_ids_without_package')
-    def _compute_quantity(self):
-        qty = 0.0
+    def _compute_uom(self):
         if self.picking_id.move_ids_without_package:
             for l in self.picking_id.move_ids_without_package:
-                qty = qty + l.product_uom_qty
-        self.qty = qty
+                uom_id = l.product_uom
+            self.uom_id = uom_id.id
+        else:
+            self.uom_id = None
 
     @api.depends('picking_id')
     def _compute_price_ttc(self):
@@ -112,18 +114,19 @@ class QualityCheck(models.Model):
                     'user_id': self.env.user.id,
                     'direction_id': user_id.id,
                     'dir_validation_date': datetime.date.today(),
-                    'control_date': datetime.now()})
+                    'control_date': datetime.date.today()})
         return self.redirect_after_pass_fail()
 
     def do_fail(self):
         user_id = self.env.user
+        print('-----------', datetime.date.today())
         self.write({
             'quality_state': 'fail',
             'direction': "Réfusé par",
             'user_id': self.env.user.id,
             'direction_id': user_id.id,
             'dir_validation_date': datetime.date.today(),
-            'control_date': datetime.now()})
+            'control_date': datetime.date.today()})
         return self.redirect_after_pass_fail()
 
     def do_cancel(self):
@@ -203,8 +206,10 @@ class Picking(models.Model):
     quantity_done = fields.Float(compute='_compute_quantity_done', string="Fait")
     purchase_id = fields.Many2one('purchase.order', string="Commande fournisseur", readonly=True)
     account_move_id = fields.Many2one('account.move', string="Avoir", readonly=True)
-    ticket_number = fields.Integer(string="Numéro de ticket", required=False)
+    ticket_number = fields.Integer(string="Numéro de ticket")
+    pesage_externe = fields.Float(string="Pesage externe")
     tri = fields.Boolean(string="Besoin de tri")
+    supplier_raw = fields.Boolean(related='partner_id.supplier_materiel', string="Fournisseur de matier", store=True)
     deadline_tri = fields.Date(string="Date fin de tri")
     expected_date = fields.Date(compute='_compute_date', string="Date prévue fin de tri")
     approval_id = fields.Many2one('approval.request', string="Demande d'approbation")
