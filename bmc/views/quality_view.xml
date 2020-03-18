@@ -521,4 +521,16 @@
             </field>
         </record>
 
+        <!--sale.order-->
+        <record id="sale_order_form_view_inherited_bmc" model="ir.ui.view">
+            <field name="name">account.tax.form.inherit.bmc</field>
+            <field name="model">account.tax</field>
+            <field name="inherit_id" ref="account.view_tax_form"/>
+            <field name="arch" type="xml">
+              <xpath expr="//field[@name='active']" position="after">
+                <field name="exo_ok" />
+              </xpath>
+            </field>
+        </record>
+
 </odoo>

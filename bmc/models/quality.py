@@ -452,6 +452,12 @@ class StockMoveLine(models.Model):
     partner_product_id = fields.Many2one('product.supplier.info', string="Fournisseur/Article")
 
 
+class AccountTax(models.Model):
+    _inherit = "account.tax"
+
+    exo_ok = fields.Boolean(string='Exonéré de TVA achats')
+
+
 class PurchaseOrderLine(models.Model):
     _inherit = "purchase.order.line"
 
@@ -464,8 +470,12 @@ class PurchaseOrderLine(models.Model):
                 self.taxes_id = self.product_id.supplier_taxes_id
             elif self.product_id.raw_materials and self.tva is not True:
                 self.taxes_id = None
-                self.taxes_id = (147, 147)
-                #self.taxes_id = (110, 110)
+                taxe_id = self.env['account.tax'].search([('exo_ok', '=', True)])
+                print('--------', taxe_id)
+                if taxe_id:
+                    self.taxes_id = (taxe_id.id, taxe_id.id)
+                else:
+                    pass
 
 
 class MrpBom(models.Model):
