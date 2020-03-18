@@ -37,7 +37,7 @@ class QualityCheck(models.Model):
     tri_resp = fields.Text(string="Responsable Tri", readonly=True)
     stock_resp = fields.Text(string="Responsable stock", readonly=True)
     quality_resp = fields.Text(string="Responsable quality", readonly=True)
-    ticket_number = fields.Integer(related='picking_id.ticket_number', string="Numéro de ticket", readonly=True)
+    ticket_number = fields.Char(related='picking_id.ticket_number', string="Numéro de ticket", readonly=True)
     days_number = fields.Integer(string="Objectif nombre de jours de tri")
     purchase_order_id = fields.Many2one('purchase.order', string="Bon de commande",
                                         readonly=True)
@@ -206,7 +206,7 @@ class Picking(models.Model):
     quantity_done = fields.Float(compute='_compute_quantity_done', string="Fait")
     purchase_id = fields.Many2one('purchase.order', string="Commande fournisseur", readonly=True)
     account_move_id = fields.Many2one('account.move', string="Avoir", readonly=True)
-    ticket_number = fields.Integer(string="Numéro de ticket")
+    ticket_number = fields.Char(string="Numéro de ticket")
     pesage_externe = fields.Float(string="Pesage externe")
     tri = fields.Boolean(string="Besoin de tri")
     supplier_raw = fields.Boolean(related='partner_id.supplier_materiel', string="Fournisseur de matier", store=True)
