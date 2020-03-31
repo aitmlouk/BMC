@@ -245,7 +245,7 @@ class Picking(models.Model):
         if not self.deadline_tri:
             self.purchase_id.order_tri = False
 
-    def action_done(self):
+    '''def action_done(self):
         """Changes picking state to done by processing the Stock Moves of the Picking
 
         Normally that happens when the button "Done" is pressed on a Picking view.
@@ -304,7 +304,7 @@ class Picking(models.Model):
         todo_moves._action_done(cancel_backorder=self.env.context.get('cancel_backorder'))
         self.write({'date_done': fields.Datetime.now()})
         self._send_confirmation_email()
-        return True
+        return True'''
 
     def _create_backorder(self):
 
