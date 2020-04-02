@@ -245,7 +245,7 @@ class Picking(models.Model):
         if not self.deadline_tri:
             self.purchase_id.order_tri = False
 
-    '''def action_done(self):
+    def action_done(self):
         """Changes picking state to done by processing the Stock Moves of the Picking
 
         Normally that happens when the button "Done" is pressed on a Picking view.
@@ -304,9 +304,9 @@ class Picking(models.Model):
         todo_moves._action_done(cancel_backorder=self.env.context.get('cancel_backorder'))
         self.write({'date_done': fields.Datetime.now()})
         self._send_confirmation_email()
-        return True'''
+        return True
 
-    '''def _create_backorder(self):
+    def _create_backorder(self):
 
         """ This method is called when the user chose to create a backorder. It will create a new
         picking, the backorder, and move the stock.moves that are not `done` or `cancel` into it.
@@ -330,7 +330,7 @@ class Picking(models.Model):
                 moves_to_backorder.mapped('move_line_ids').write({'picking_id': backorder_picking.id})
                 backorder_picking.action_assign()
                 backorders |= backorder_picking
-        return backorders'''
+        return backorders
 
 
 class StockReturnPiking(models.TransientModel):
