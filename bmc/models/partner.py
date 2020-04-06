@@ -41,7 +41,7 @@ class ProductSupplierInfo(models.Model):
     move_return_ids = fields.One2many('stock.move', 'partner_id2', string="Mouvement de stock retour",
                                       domain=['&',('state','=','done'),('picking_type_id.name','ilike','Retour')])
     move_prod_ids = fields.One2many('stock.move.line', 'partner_id2', string="Mouvement de stock prod",
-                                    domain=[('partner_id2', '!=', False)])
+                                    domain=[('partner_id2', '!=', False),('broyage', '=', False)])
     qty_livre = fields.Float(string="Quantités livrées", compute='action_compute_qty_livre')
     qty_retour = fields.Float(string="Retours", compute='action_compute_qty_retour')
     qty_prod = fields.Float(string="Produits -Tri", compute='action_compute_qty_prod')

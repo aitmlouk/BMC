@@ -450,6 +450,7 @@ class StockMoveLine(models.Model):
 
     partner_id = fields.Many2one('res.partner', string="Fournisseur")
     partner_product_id = fields.Many2one('product.supplier.info', string="Fournisseur/Article")
+    broyage = fields.Boolean(string='Broyage')
 
 
 class AccountTax(models.Model):
