@@ -533,4 +533,15 @@
             </field>
         </record>
 
+    <!--stock move line-->
+    <record id="stock_move_line_form_view_inherited_bmc" model="ir.ui.view">
+        <field name="name">stock.move.line.form.inherit.bmc</field>
+        <field name="model">stock.move.line</field>
+        <field name="inherit_id" ref="stock.view_move_line_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='location_dest_id']" position="after">
+                <field name="broyage"/>
+            </xpath>
+        </field>
+    </record>
 </odoo>
