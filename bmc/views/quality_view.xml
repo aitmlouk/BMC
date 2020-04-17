@@ -133,7 +133,7 @@
 
 
     <!--wizard-->
-    <act_window name="Generate order" id="act_stock_mrp_generate"
+    <act_window name="Fiche de tri" id="act_stock_mrp_generate"
         res_model="generate.mrp.production"
         view_mode="form" target="new"/>
 
@@ -159,6 +159,9 @@
         <field name="model">stock.picking</field>
         <field name="inherit_id" ref="stock.view_picking_form"/>
         <field name="arch" type="xml">
+            <xpath expr="//field[@name='scheduled_date']" position="attributes">
+                <attribute name="attrs">{'readonly': 0}</attribute>
+            </xpath>
             <xpath expr="//field[@name='picking_type_id']" position="after">
                 <field name="ticket_number"/>
                 <field name="pesage_externe"/>
@@ -176,9 +179,9 @@
                 <field name="deadline_tri" readonly="1"/>
             </xpath>
             <xpath expr="//button[@name='action_cancel']" position="after">
-                <button name="action_tri" string="Fin du Tri" attrs="{'invisible': [('picking_type_id', '!=', 1),('supplier_raw', '!=', 1)]}" type="object" class="oe_highlight"/>
-                <button name="cancel_action_tri" string="Annuler fin du Tri" attrs="{'invisible': [('picking_type_id', '!=', 1),('supplier_raw', '!=', 1)]}" type="object" class="oe_highlight"/>
-                <button name="%(act_stock_mrp_generate)d" string="Fiche de tri"  attrs="{'invisible': [('picking_type_id', '!=', 1),('supplier_raw', '!=', 1)]}" type="action" class="oe_highlight"/>
+                <button name="action_tri" string="Fin du Tri" attrs="{'invisible': ['|','|',('picking_type_id', '!=', 1),('supplier_raw', '!=', True),('state', '!=', 'done')]}" type="object" class="oe_highlight"/>
+                <button name="cancel_action_tri" string="Annuler fin du Tri" attrs="{'invisible': ['|','|',('picking_type_id', '!=', 1),('supplier_raw', '!=', True),('state', '!=', 'done')]}" type="object" class="oe_highlight"/>
+                <button name="%(act_stock_mrp_generate)d" string="Fiche de tri"  attrs="{'invisible': ['|','|',('picking_type_id', '!=', 1),('supplier_raw', '!=', True),('state', '!=', 'done')]}" type="action" class="oe_highlight"/>
             </xpath>
         </field>
     </record>

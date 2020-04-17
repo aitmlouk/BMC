@@ -36,7 +36,7 @@ class QualityCheck(models.Model):
     direction = fields.Text(string="Direction", readonly=True)
     tri_resp = fields.Text(string="Responsable Tri", readonly=True)
     stock_resp = fields.Text(string="Responsable stock", readonly=True)
-    quality_resp = fields.Text(string="Responsable quality", readonly=True)
+    quality_resp = fields.Text(string="Responsable qualité", readonly=True)
     ticket_number = fields.Char(related='picking_id.ticket_number', string="Numéro de ticket", readonly=True)
     days_number = fields.Integer(string="Objectif nombre de jours de tri")
     purchase_order_id = fields.Many2one('purchase.order', string="Bon de commande",
@@ -344,7 +344,7 @@ class GenerateOrder(models.TransientModel):
     _rec_name = 'product_id'
     _description = 'Return Picking Line'
 
-    product_id = fields.Many2one('product.product', string="Produit à fabriquer", required=True)
+    product_id = fields.Many2one('product.product', string="Produit issu du tri", required=True)
     picking_id = fields.Many2one('stock.picking', string="Transfert")
 
     def create_mrp(self):

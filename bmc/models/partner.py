@@ -42,9 +42,12 @@ class ProductSupplierInfo(models.Model):
                                       domain=['&',('state','=','done'),('picking_type_id.name','ilike','Retour')])
     move_prod_ids = fields.One2many('stock.move.line', 'partner_id2', string="Mouvement de stock prod",
                                     domain=[('partner_id2', '!=', False),('broyage', '=', False)])
+    move_broyage_ids = fields.One2many('stock.move.line', 'partner_id2', string="Mouvement de stock broyage",
+                                    domain=[('broyage', '=', True)])
     qty_livre = fields.Float(string="Quantités livrées", compute='action_compute_qty_livre')
     qty_retour = fields.Float(string="Retours", compute='action_compute_qty_retour')
     qty_prod = fields.Float(string="Produits -Tri", compute='action_compute_qty_prod')
+    qty_broyage = fields.Float(string="Broyage", compute='action_compute_qty_broyage')
     taux_efficacite = fields.Float(string="Efficacité", compute='action_compute_taux_efficacite')
 
     @api.depends('move_ids')
@@ -71,6 +74,14 @@ class ProductSupplierInfo(models.Model):
                 total += line.qty_done
             rec.qty_prod = total
 
+    @api.depends('move_broyage_ids')
+    def action_compute_qty_broyage(self):
+        for rec in self:
+            total = 0.0
+            for line in rec.move_broyage_ids:
+                total += line.quantity_done
+            rec.qty_broyage = total
+
     @api.depends('move_ids', 'move_return_ids', 'move_prod_ids')
     def action_compute_taux_efficacite(self):
         for rec in self:
@@ -86,8 +97,12 @@ class ProductSupplierInfo(models.Model):
                 for line in rec.move_prod_ids:
                     total2 += line.qty_done
 
+                total3 = 0.0
+                for line in rec.move_broyage_ids:
+                    total3 += line.qty_done
+
                 if total > 0:
-                    rec.taux_efficacite = ((total - total1 - total2) * 100) / total
+                    rec.taux_efficacite = ((total - total1 - total2 - total3) * 100) / total
                 else:
                     rec.taux_efficacite = 0.0
 
