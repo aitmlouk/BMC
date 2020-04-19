@@ -79,7 +79,7 @@ class ProductSupplierInfo(models.Model):
         for rec in self:
             total = 0.0
             for line in rec.move_broyage_ids:
-                total += line.quantity_done
+                total += line.qty_done
             rec.qty_broyage = total
 
     @api.depends('move_ids', 'move_return_ids', 'move_prod_ids')
