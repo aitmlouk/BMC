@@ -178,10 +178,15 @@
                 <field name="expected_date" invisible="0" readonly="1"/>
                 <field name="deadline_tri" readonly="1"/>
             </xpath>
+             <xpath expr="//field[@name='purchase_id']" position="after">
+                <field name="in_weight"/>
+                <field name="out_weight"/>
+            </xpath>
             <xpath expr="//button[@name='action_cancel']" position="after">
                 <button name="action_tri" string="Fin du Tri" attrs="{'invisible': ['|','|',('picking_type_id', '!=', 1),('supplier_raw', '!=', True),('state', '!=', 'done')]}" type="object" class="oe_highlight"/>
                 <button name="cancel_action_tri" string="Annuler fin du Tri" attrs="{'invisible': ['|','|',('picking_type_id', '!=', 1),('supplier_raw', '!=', True),('state', '!=', 'done')]}" type="object" class="oe_highlight"/>
                 <button name="%(act_stock_mrp_generate)d" string="Fiche de tri"  attrs="{'invisible': ['|','|',('picking_type_id', '!=', 1),('supplier_raw', '!=', True),('state', '!=', 'done')]}" type="action" class="oe_highlight"/>
+                <button name="read_balance" string="Lire la balance" type="object" class="oe_highlight"/>
             </xpath>
         </field>
     </record>
