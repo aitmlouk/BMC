@@ -7,7 +7,9 @@ from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT
 from odoo.tools.float_utils import float_compare, float_is_zero, float_round
 from odoo.exceptions import UserError
 from odoo.addons.stock.models.stock_move import PROCUREMENT_PRIORITIES
-
+import csv
+import os
+import inspect
 
 class QualityCheck(models.Model):
     _inherit = "quality.check"
@@ -214,6 +216,9 @@ class Picking(models.Model):
     expected_date = fields.Date(compute='_compute_date', string="Date prévue fin de tri")
     approval_id = fields.Many2one('approval.request', string="Demande d'approbation")
 
+    in_weight = fields.Float(string="Balance In")
+    out_weight = fields.Float(string="Balance Out")
+
     def _compute_date(self):
         quality_id = self.env['quality.check'].search([('picking_id', '=', self.id)])
         if quality_id:
@@ -331,6 +336,24 @@ class Picking(models.Model):
                 backorder_picking.action_assign()
                 backorders |= backorder_picking
         return backorders
+
+    def read_balance(self):
+        directory_path = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+        path = os.path.join(directory_path, 'file.txt')
+        print('path', path)
+        file = open(path, "r")
+        line = file.readline()
+        in_weight = line.split(',')[0]
+        out_weight = line.split(',')[1]
+        print(in_weight)
+        print(out_weight)
+        if out_weight == '0000':
+            self.in_weight = None
+            self.out_weight = None
+        else:
+            self.in_weight = in_weight
+            self.out_weight = out_weight
+
 
 
 class StockReturnPiking(models.TransientModel):
