@@ -343,17 +343,18 @@ class Picking(models.Model):
         print('path', path)
         file = open(path, "r")
         line = file.readline()
+
         in_weight = line.split(',')[0]
         out_weight = line.split(',')[1]
-        print(in_weight)
-        print(out_weight)
-        if out_weight == '0000':
-            self.in_weight = None
-            self.out_weight = None
-        else:
-            self.in_weight = in_weight
-            self.out_weight = out_weight
 
+        print(type(in_weight))
+        print(out_weight)
+
+        if out_weight == '0000':
+            if self.in_weight:
+                self.out_weight = float(in_weight)
+            else:
+                self.in_weight = float(in_weight)
 
 
 class StockReturnPiking(models.TransientModel):
