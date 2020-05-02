@@ -347,14 +347,11 @@ class Picking(models.Model):
         in_weight = line.split(',')[0]
         out_weight = line.split(',')[1]
 
-        print(type(in_weight))
-        print(out_weight)
-
         if out_weight == '0000':
-            if self.x_pesee1:
-                self.x_pesee2 = float(in_weight)
+            if self.in_weight:
+                self.out_weight = float(in_weight)
             else:
-                self.x_pesee1 = float(in_weight)
+                self.in_weight = float(in_weight)
 
 
 class StockReturnPiking(models.TransientModel):
