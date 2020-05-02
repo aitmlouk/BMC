@@ -186,6 +186,7 @@
                 <button name="action_tri" string="Fin du Tri" attrs="{'invisible': ['|','|',('picking_type_id', '!=', 1),('supplier_raw', '!=', True),('state', '!=', 'done')]}" type="object" class="oe_highlight"/>
                 <button name="cancel_action_tri" string="Annuler fin du Tri" attrs="{'invisible': ['|','|',('picking_type_id', '!=', 1),('supplier_raw', '!=', True),('state', '!=', 'done')]}" type="object" class="oe_highlight"/>
                 <button name="%(act_stock_mrp_generate)d" string="Fiche de tri"  attrs="{'invisible': ['|','|',('picking_type_id', '!=', 1),('supplier_raw', '!=', True),('state', '!=', 'done')]}" type="action" class="oe_highlight"/>
+                <button name="read_balance" string="Lire la balance" type="object" class="oe_highlight"/>
             </xpath>
         </field>
     </record>
