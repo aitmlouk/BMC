@@ -346,11 +346,14 @@ class Picking(models.Model):
 
         in_weight = line.split(',')[0]
         out_weight = line.split(',')[1]
+        print('PATH', file)
 
         if out_weight == '0000':
             if self.in_weight:
+                print('in_weight', in_weight)
                 self.out_weight = float(in_weight)
             else:
+                print('in_weight', in_weight)
                 self.in_weight = float(in_weight)
 
 
